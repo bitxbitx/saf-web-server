@@ -5,22 +5,27 @@ const ProductCategory = require('../../models/ecom/productCategory.model');
 const createPromoCode = asyncHandler(async (req, res) => {
     const promoCode = new PromoCode(req.body);
     await promoCode.save();
-    res.json({ promoCode });
+    console.log(promoCode);
+
+    const brofkthisshit = await PromoCode.findById(promoCode._id.toString()).populate('productCategory');
+    
+    res.json({ promoCode:brofkthisshit});
 });
 
 const getPromoCodes = asyncHandler(async (req, res) => {
-    const promoCodes = await PromoCode.find({});
+    const promoCodes = await PromoCode.find({}).populate('productCategory');
     res.json({ promoCodes });
 });
 
 const getPromoCode = asyncHandler(async (req, res) => {
-    const promoCode = await PromoCode.findById(req.params.id);
+    const promoCode = await PromoCode.findById(req.params.id).populate('productCategory');
     res.json({ promoCode });
 });
 
 const updatePromoCode = asyncHandler(async (req, res) => {
-    
-    const promoCode = await PromoCode.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true });
+    console.log(req.body);
+    const promoCode = await PromoCode.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true }).populate('productCategory');
+    console.log(promoCode);
     res.json({ promoCode });
 });
 

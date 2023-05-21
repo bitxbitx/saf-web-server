@@ -24,7 +24,7 @@ const productSchema = mongoose.Schema(
             type: Map,
             of: String,
         },
-        productDetails: [String],
+        productDetails: String,
         status: {
             type: String,
             enum: ['active', 'archived', 'closed'],
