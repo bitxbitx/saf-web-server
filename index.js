@@ -21,7 +21,7 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 
 // Cors
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:8000', 'https://saf-web-client.vercel.app']; // add any other origins that you want to allow
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:8000', 'https://saf-web-client.vercel.app', 'https://safwebserver.online']; // add any other origins that you want to allow
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -71,10 +71,8 @@ app.use('/api/statistics', require('./routes/statistics/statistics.routes'));
 // Fetch Image
 app.use('/uploads', express.static('uploads'));
 
-// Temp
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// Payment Routes
+app.use('/api/payment', require('./routes/payment/payment.routes.js'));
 
 // Start the server
 const server = app.listen(port, () => console.log(`Server started on port ${port}`));

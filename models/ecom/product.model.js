@@ -7,10 +7,9 @@ const productSchema = mongoose.Schema(
             required: [true, 'Please add a name value'],
         },
         description: String,
-        // TODO: Make it an array of strings
-        image: {
+        images: [{
             type: String,
-        },
+        }],
         productCategory: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ProductCategory',
@@ -24,25 +23,17 @@ const productSchema = mongoose.Schema(
             type: Map,
             of: String,
         },
-        productDetails: String,
+        // productDetails: String,
         status: {
             type: String,
             enum: ['active', 'archived', 'closed'],
             default: 'active',
         },
-        sku: {
+        productType: {
             type: String,
-            default: '',
-        },
-        price: {
-            type: Number,
-            default: 0,
-        },
-        stock: {
-            type: Number,
-            default: 0,
-        },
-
+            enum: ['simple', 'variable'],
+            default: 'simple',
+        }
     },
     {
         timestamps: true,

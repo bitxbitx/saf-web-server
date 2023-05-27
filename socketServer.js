@@ -26,8 +26,6 @@ module.exports = (server) => {
 
       // Add them to the clients object
       clients[userId] = socket;
-      console.log('clients.length', Object.keys(clients).length);
-      console.log('chatSessions.length', chatSessions.length);
 
       socket.emit('receive message', chatSessions);
     })
@@ -59,7 +57,6 @@ module.exports = (server) => {
 
       // Send the message to the other participant
       const otherParticipant = chatSession.participants.find((participant) => participant._id.toString() !== userId);
-      // console.log('otherParticipant', otherParticipant._id);
       console.log('otherParticipant.name', otherParticipant.name);
       // clients[otherParticipant].emit('receive message', chatMessage);
 
@@ -75,12 +72,8 @@ module.exports = (server) => {
 
       // Check if the other participant is still connected
       if (!clients[otherParticipant._id]) {
-        // console.log('clients[otherParticipant]', clients[otherParticipant._id])
-        // console.log('clients.length', Object.keys(clients).length);
         console.log('Other participant is not connected');
       } else {
-        // console.log('clients[otherParticipant]', clients[otherParticipant._id])
-        // console.log('clients[otherParticipant].name', otherParticipant.name);
         clients[otherParticipant._id].emit('receive message', updatedChatSessions);
       }
 
@@ -116,7 +109,7 @@ module.exports = (server) => {
         }
         return curr;
       });
-
+      
       // Create a new ChatSession with the customer and the support agent
       const user = await User.findById(userId);
       const chatSession = await ChatSession.create({
@@ -164,8 +157,6 @@ module.exports = (server) => {
 
     socket.on('support:markAsDone', async ({userId, sessionId}) => {
       console.log('Support marking chat session as done:', sessionId);
-
-      // console.log('sessionId', sessionId);
 
       // Update the ChatSession in the database
       const chatSession = await ChatSession.findById(sessionId).populate('participants').populate('messages').exec();

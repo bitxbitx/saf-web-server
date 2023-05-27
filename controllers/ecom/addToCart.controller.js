@@ -21,7 +21,7 @@ const removeFromCart = asyncHandler(async (req, res) => {
     if (cart.length > 0) {
         cart[0].status = 'removed';
         await cart[0].save();
-        res.json({ cart });
+        res.json({ cart }); 
     } else {
         res.status(400).json({ error: 'Cart not found' });
     }

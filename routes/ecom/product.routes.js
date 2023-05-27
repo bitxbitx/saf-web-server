@@ -34,7 +34,7 @@ const upload = multer({
   });
 
 
-router.route('/').get(protect, getProducts).post(protect, upload.single('image'), createProduct)
-router.route('/:id').get(protect, getProduct).put(protect, upload.single('image'), updateProduct).delete(protect, deleteProduct)
+router.route('/').get(protect, getProducts).post(protect, upload.array('images'), createProduct)
+router.route('/:id').get(protect, getProduct).put(protect, upload.array('images'), updateProduct).delete(protect, deleteProduct)
 
 module.exports = router

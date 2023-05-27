@@ -28,7 +28,7 @@ ig.state.generateDevice(IG_USERNAME);
   const loggedInUser = await ig.account.login(IG_USERNAME, IG_PASSWORD);
   // The same as preLoginFlow()
   // Optionally wrap it to process.nextTick so we dont need to wait ending of this bunch of requests
-  process.nextTick(async () => await ig.simulate.postLoginFlow());
+  // process.nextTick(async () => await ig.simulate.postLoginFlow());
   // Create UserFeed instance to get loggedInUser's posts
   const userFeed = ig.feed.user(loggedInUser.pk);
   const myPostsFirstPage = await userFeed.items();
@@ -44,6 +44,7 @@ ig.state.generateDevice(IG_USERNAME);
 //     },
 //     d: sample([0, 1]),
 //   });
-    console.log(myPostsFirstPage);
-    console.log(myPostsSecondPage);
+    // console.log(userFeed);
+    console.log(JSON.stringify(myPostsFirstPage));
+    // console.log(myPostsSecondPage);
 })();

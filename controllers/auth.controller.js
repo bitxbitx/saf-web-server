@@ -14,8 +14,6 @@ const { signAccessToken, signRefreshToken } = require('../config/jwtHelper');
  */
 const login = asyncHandler(async (req, res) => {
     const { usernameEmailOrPhoneNumber, password } = req.body;
-    console.log(usernameEmailOrPhoneNumber);
-    console.log(password);
     
     const user = await User.findOne({ $or : [{ username: usernameEmailOrPhoneNumber }, { email: usernameEmailOrPhoneNumber }, { phoneNumber: usernameEmailOrPhoneNumber }]  });
 

@@ -1,20 +1,31 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../../models/ecom/product.model');
 const ProductVariant = require('../../models/ecom/productVariant.model');
-
+require('dotenv').config();
 
 const createProduct = asyncHandler(async (req, res) => {
-    if (req.file) { req.body.image = req.file.path }
-    // Change string to json for productCategory
+    const imagePaths = [];
+    // Check if any files were uploaded
+    if (req.files && req.files.length > 0) {
+      // Iterate through each uploaded file
+      req.files.forEach((file) => {
+        imagePaths.push(process.env.SERVER_URL + file.path);
+      });
+    }
+  
+    // Assign the array of image paths to the req.body.images property
+    req.body.images = imagePaths;
+  
+    // Change string to JSON for productCategory
     req.body.productCategory = JSON.parse(req.body.productCategory);
-
+  
     // Extract only the _id
     req.body.productCategory = req.body.productCategory.map((item) => item._id);
-
+  
     const product = new Product(req.body);
     await product.save();
     res.json({ product });
-});
+  });
 
 const getProducts = asyncHandler(async (req, res) => {
     const products = await Product.find({}).populate('productVariant').populate('productCategory');
@@ -28,10 +39,23 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-    if (req.file) { req.body.image = req.file.path }
-    // Change string to json for productCategory
-    req.body.productCategory = JSON.parse(req.body.productCategory);
+    
+    const imagePaths = req.body.images || [];
+    // Check if any files were uploaded
+    if (req.files && req.files.length > 0) {
+      // Iterate through each uploaded file
+      req.files.forEach((file) => {
+        imagePaths.push(process.env.SERVER_URL + file.path);
+      });
+    }
 
+  
+    // Assign the array of image paths to the req.body.images property
+    req.body.images = imagePaths;
+  
+    // Change string to JSON for productCategory
+    req.body.productCategory = JSON.parse(req.body.productCategory);
+  
     // Extract only the _id
     req.body.productCategory = req.body.productCategory.map((item) => item._id);
 
