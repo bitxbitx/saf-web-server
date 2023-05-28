@@ -2,8 +2,8 @@ const asyncHandler = require('express-async-handler');
 const Wishlist = require('../../models/ecom/wishlist.model');
 
 const createWishlist = asyncHandler(async (req, res) => {
-    const userId = req.userId;
-    const wishlist = new Wishlist({ userId, ...req.body });
+    const user = req.userId;
+    const wishlist = new Wishlist({ user, ...req.body });
     await wishlist.save();
     res.json({ wishlist });
 });
@@ -19,7 +19,8 @@ const updateWishlist = asyncHandler(async (req, res) => {
 });
 
 const deleteWishlist = asyncHandler(async (req, res) => {
-    const wishlist = await Wishlist.findOneAndDelete({ _id: req.params.id });
+    const { product } = req.body;
+    const wishlist = await Wishlist.findOneAndDelete({ user: req.params.id, product });
     res.json({ message: 'Wishlist removed' });
 });
 
@@ -28,4 +29,9 @@ const getWishlists = asyncHandler(async (req, res) => {
     res.json({ wishlists });
 });
 
-module.exports = { createWishlist, getWishlist, updateWishlist, deleteWishlist, getWishlists };
+const getWishlistByUser = asyncHandler(async (req, res) => {
+    const wishlists = await Wishlist.find({ user: req.params.id });
+    res.json({ wishlists });
+});
+
+module.exports = { createWishlist, getWishlist, updateWishlist, deleteWishlist, getWishlists, getWishlistByUser };

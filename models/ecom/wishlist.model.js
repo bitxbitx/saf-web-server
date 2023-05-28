@@ -8,13 +8,8 @@ const WishlistSchema = new mongoose.Schema({
   },
   product: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ProductVariant',
+    ref: 'Product',
     required: true,
-  },
-  status: {
-    type: String,
-    enum: ['added', 'removed'],
-    default: 'added',
   },
 }, { timestamps: true });
 

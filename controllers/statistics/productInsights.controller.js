@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Order = require('../../models/ecom/order.model');
 const Product = require('../../models/ecom/product.model');
-const productVariant = require('../../models/ecom/productVariant.model');
+const ProductVariant = require('../../models/ecom/productVariant.model');
 
 const productInsights = asyncHandler(async (req, res) => {
     /**
@@ -44,104 +44,87 @@ const productInsights = asyncHandler(async (req, res) => {
 
     console.log(`Fetching data for the last ${timeFrame}...`);
 
-    const orderAggregateData = await Order.aggregate([
-        {
-            $match: {
-                createdAt: { $gte: new Date(timeFrameInMillisecondsAgo) }
+    // Fetch all products that belong to the product category
+    const products = await Product.find().populate({
+        path: 'productVariant',
+        populate: { path: 'completedOrders' }
+        
+    })
+    const timeframeDate = new Date(timeFrameInMillisecondsAgo);
+    const productData = await Promise.all(products.map(async (product) => {
+        const productVariantIds = product.productVariant.map((productVariant) => productVariant._id);
+        const productVariantData = await ProductVariant.find({ _id: { $in: productVariantIds } }).populate('completedOrders');
+      
+        const totalSales = productVariantData.reduce((accumulator, productVariant) => {
+          return accumulator + productVariant.completedOrders.reduce((accumulator, completedOrder) => {
+            if (completedOrder.createdAt >= timeframeDate) {
+              return accumulator + completedOrder.totalPrice;
+            } else {
+              return accumulator;
             }
-        },
-        {
-            $group: {
-                _id: {
-                    year: { $year: '$createdAt' },
-                    month: { $month: '$createdAt' },
-                    day: { $dayOfMonth: '$createdAt' }
-                },
-                totalAmount: { $sum: '$totalAmount' },
-                count: { $sum: 1 }
+          }, 0);
+        }, 0);
+      
+        const totalNumberOfOrders = productVariantData.reduce((accumulator, productVariant) => {
+          return accumulator + productVariant.completedOrders.reduce((accumulator, completedOrder) => {
+            if (completedOrder.createdAt >= timeframeDate) {
+              return accumulator + 1;
+            } else {
+              return accumulator;
             }
-        },
-        {
-            $sort: {
-                '_id.year': 1,
-                '_id.month': 1,
-                '_id.day': 1
-            }
-        }
-    ]);
-
-    const productAggregateData = await Product.aggregate([
-        {
-            $match: {
-                category: productCategory
-            }
-        },
-        {
-            $lookup: {
-                from: 'productvariants',
-                localField: '_id',
-                foreignField: 'product',
-                as: 'productVariants'
-            }
-        },
-        {
-            $unwind: '$productVariants'
-        },
-        {
-            $group: {
-                _id: '$_id',
-                name: { $first: '$name' },
-                totalSales: { $sum: '$productVariants.totalSales' },
-                totalOrders: { $sum: '$productVariants.totalOrders' },
-                totalUnitsSold: { $sum: '$productVariants.totalUnitsSold' },
-                totalUnitsInStock: { $sum: '$productVariants.totalUnitsInStock' },
-                wishlistCount: { $sum: '$productVariants.wishlistCount' },
-                addToCartCount: { $sum: '$productVariants.addToCartCount' }
-            }
-        },
-        {
-            $sort: {
-                totalSales: -1
-            }
-        }
-    ]);
-
-    const productVariantAggregateData = await productVariant.aggregate([
-        {
-            $match: {
-                product: { $in: productAggregateData.map(product => product._id) }
-            }
-        },
-        {
-            $group: {
-                _id: '$product',
-                variants: {
-                    $push: {
-                        _id: '$_id',
-                        name: '$name',
-                        totalSales: '$totalSales',
-                        totalOrders: '$totalOrders',
-                        totalUnitsSold: '$totalUnitsSold',
-                        totalUnitsInStock: '$totalUnitsInStock',
-                        wishlistCount: '$wishlistCount',
-                        addToCartCount: '$addToCartCount'
-                    }
+          }, 0);
+        }, 0);
+      
+        const totalNumberOfUnitsSold = productVariantData.reduce((accumulator, productVariant) => {
+          return accumulator + productVariant.completedOrders.reduce((accumulator, completedOrder) => {
+            if (completedOrder.createdAt >= timeframeDate) {
+              return accumulator + completedOrder.orderItems.reduce((accumulator, orderItem) => {
+                if (orderItem.productVariant._id.toString() === productVariant._id.toString()) {
+                  return accumulator + orderItem.quantity;
+                } else {
+                  return accumulator;
                 }
+              }, 0);
+            } else {
+              return accumulator;
             }
-        }
-    ]);
-
-    const productData = productAggregateData.map(product => {
-        const productVariant = productVariantAggregateData.find(productVariant => productVariant._id.toString() === product._id.toString());
+          }, 0);
+        }, 0);
+      
+        const totalNumberOfUnitsInStock = productVariantData.reduce((accumulator, productVariant) => {
+          return accumulator + productVariant.stock;
+        }, 0);
+      
+        const sellThroughRate = totalNumberOfUnitsSold / (totalNumberOfUnitsInStock + totalNumberOfUnitsSold);
+      
+        const wishlistCount = await productVariantData.reduce(async (accumulator, productVariant) => {
+          productVariant.timeframeDate = timeframeDate;
+          var temp = await productVariant.wishlistCountWithinTimeframe;
+          return accumulator + temp;
+        }, 0);
+      
+        const addToCartCount = await productVariantData.reduce(async (accumulator, productVariant) => {
+          productVariant.timeframeDate = timeframeDate;
+          var temp = await productVariant.addToCartCountWithinTimeframe;
+          return accumulator + temp;
+        }, 0);
+      
         return {
-            ...product,
-            variants: productVariant.variants
-        }
-    }
-    );
-
+          product: product,
+          category: product.productCategory,
+          totalSales,
+          totalNumberOfOrders,
+          totalNumberOfUnitsSold,
+          totalNumberOfUnitsInStock,
+          sellThroughRate,
+          wishlistCount,
+          addToCartCount
+        };
+      }));
+      
+      console.log(productData);
+               
     res.json({
-        orderAggregateData,
         productData
     });
 

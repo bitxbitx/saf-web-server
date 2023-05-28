@@ -10,15 +10,21 @@ const Schema = mongoose.Schema
 
 const orderSchema = Schema(
     {
-        customer:{
+        customer: {
             type: Schema.Types.ObjectId,
-            ref: "Customer",
+            ref: "User",
             required: true,
         },
         orderItems: [{
-            type: Schema.Types.ObjectId,
-            ref: "ProductVariant",
-            required: true,
+            productVariant: {
+                type: Schema.Types.ObjectId,
+                ref: "ProductVariant",
+                required: true,
+            },
+            quantity: {
+                type: Number,
+                required: true,
+            },
         }],
         totalPrice: {
             type: Number,
@@ -26,27 +32,17 @@ const orderSchema = Schema(
         },
         status: {
             type: String,
-            required: true,
+            enum: ['pending', 'processing', 'completed', 'cancelled'],
+            default: 'pending',
         },
         paymentMethod: {
             type: String,
         },
-        promoCodeUsed:{
+        promoCodeUsed: {
             type: Schema.Types.ObjectId,
             ref: "PromoCode"
         },
-        shippingAddress: {
-            type: String,
-        },
-        shippingCost: {
-            type: Number,
-        },
-        shippingMethod: {
-            type: String,
-        },
-        shippingStatus: {
-            type: String,
-        },
+
 
     },
     {

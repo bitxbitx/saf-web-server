@@ -38,7 +38,9 @@ const promoCodeSchema = Schema(
         maxUsesPerUser: Number,
     },
     {
-        timestamps: true
+        timestamps: true,
+        toJson: { virtuals: true },
+        toObject: { virtuals: true },
     }
 )
 

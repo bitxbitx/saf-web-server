@@ -1,47 +1,29 @@
 const asyncHandler = require('express-async-handler');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Order = require('../../models/ecom/order.model');
+const PromoCode = require('../../models/ecom/promoCode.model');
+const ProductVariant = require('../../models/ecom/productVariant.model');
 
-// const createPaymentIntent = asyncHandler(async (req, res) => {
-//   const { cartItems, shippingAddress } = req.body;
-//   const { user } = req;
+const calculateOrderAmount = (items, promoCode) =>  {
+  total = 0;
+  items.forEach(item => {
+    const decoded = JSON.parse(item.productVariant);
+    total += decoded.price * item.quantity;
+  });
+  if (promoCode) {
+    const decoded = JSON.parse(promoCode)
+    console.log(decoded);
+    if (decoded) {
+      // Check discount type
+      if (decoded.discountType === 'percentage') {
+        total = total - (total * (decoded.discountAmount / 100));
+      } else {
+        total = total - decoded.discountAmount;
+      }
+    }
+  }
 
-//   // Calculate order amount
-//   const amount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-//   // Create a PaymentIntent with the order amount and currency
-//   const paymentIntent = await stripe.paymentIntents.create({
-//     amount,
-//     currency: 'usd',
-//     metadata: { integration_check: 'accept_a_payment' },
-//     receipt_email: user.email,
-//     shipping: {
-//       name: user.name,
-//       address: {
-//         line1: shippingAddress.address,
-//         city: shippingAddress.city,
-//         postal_code: shippingAddress.postalCode,
-//         state: shippingAddress.country,
-//         country: shippingAddress.country,
-//       },
-//     },
-//   });
-
-//   res.json({ clientSecret: paymentIntent.client_secret });
-// }
-// );
-
-// module.exports = { createPaymentIntent };
-
-const calculateOrderAmount = items => {
-  // Replace this constant with a calculation of the order's amount
-  // Calculate the order total on the server to prevent
-  // people from directly manipulating the amount on the client
-  return 1400;
-
-  // Calculate the order total on the server to prevent
-  // people from directly manipulating the amount on the client
-  // return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
+  return total*100;
 };
 
 const generateResponse = intent => {
@@ -79,10 +61,10 @@ const generateResponse = intent => {
 }
 
 const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
-  const { paymentMethodId, items, currency, useStripeSdk } = req.body;
-
-  const orderAmount = calculateOrderAmount(items);
-
+  const { paymentMethodId, items, currency, useStripeSdk, promoCode } = req.body;
+console.log(req.body);
+  const orderAmount = calculateOrderAmount(items, promoCode );
+console.log(orderAmount);
   try {
     let intent;
     if (paymentMethodId) {
@@ -102,6 +84,36 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
       intent = await stripe.paymentIntents.confirm(paymentIntentId);
       // After confirm, if the PaymentIntent's status is succeeded, fulfill the order.
     }
+
+    if (intent.status === 'succeeded') {
+      const userId = req.userId;
+      // Extract Product variant from items
+      const orderItems = [];
+      items.forEach(item => {
+        const decoded = JSON.parse(item.productVariant);
+        console.log(decoded);
+        orderItems.push({
+          "productVariant" : decoded.id,
+          quantity : item.quantity,
+        });          
+      });
+      const order = new Order({ 
+        customer : userId,
+        orderItems : orderItems,
+        totalPrice : orderAmount,
+       });
+      console.log(order);
+      await order.save();
+
+      // Update Product Variant
+      items.forEach(item => {
+        const decoded = JSON.parse(item.productVariant);
+        const product = ProductVariant.findById(decoded.id);
+        product.stock = product.stock - item.quantity;
+        product.save();
+      });
+    }
+    console.log(generateResponse(intent));
     res.send(generateResponse(intent));
   }
   catch (e) {
@@ -113,7 +125,7 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
 
 const stripePayEndpointIntentId = asyncHandler(async (req, res) => {
   const { paymentIntentId } = req.body;
-  
+
   try {
     if (paymentIntentId) {
       // Confirm the PaymentIntent to finalize payment after handling a required action
