@@ -189,13 +189,11 @@ module.exports = (server) => {
 
       // Emit an event to the other participant to update their list of chat sessions
       const otherParticipant = chatSession.participants.find((participant) => participant._id !== userId);
-      console.log('otherParticipant', otherParticipant._id);
       clients[otherParticipant._id].emit('ticket closed', chatSession);
 
       // Emit an event to the support agent to update their list of chat sessions
       const updatedChatSessions = await ChatSession.find({
         participants: userId,
-        status: 'active',
       }).populate('participants').populate('messages').exec();
 
       clients[userId].emit('receive message', updatedChatSessions);
