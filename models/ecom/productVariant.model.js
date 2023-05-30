@@ -67,46 +67,6 @@ productVariantSchema.virtual('wishlistCount', {
     count: true,
 });
 
-// productVariantSchema.virtual('sales').get(function () {
-//     // Calculate the total sales of this product variant
-//     // by iterating over each order item and adding up the
-//     // quantity of the item if it matches this product variant
-//     if (!this.completedOrders) {
-//         return 0;
-//     }
-
-//     return this.completedOrders.reduce((total, order) => {
-//         // loop through each order item and add up the quantity
-//         // if the order item matches this product variant
-//         order.orderItems.forEach((orderItem) => {
-//             console.log("orderItem", orderItem)
-//             if (orderItem.productVariant.equals(this._id)) {
-//                                 total += orderItem.quantity * this.price ;
-//             }
-//         });
-//         return total;
-//     }, 0);
-// });
-
-// productVariantSchema.virtual('quantitySold').get(function () {
-//     // Calculate the total sales of this product variant
-//     // by iterating over each order item and adding up the
-//     // quantity of the item if it matches this product variant
-//     if (!this.completedOrders) {
-//         return 0;
-//     }
-//     return this.completedOrders.reduce((total, order) => {
-//         order.orderItems.forEach((orderItem) => {
-//             console.log("orderItem.productVariant", orderItem.productVariant)
-//             if (orderItem.productVariant.equals(this._id)) {
-//                 console.log("orderItem.quantity", orderItem.quantity)
-//                 total += orderItem.quantity ;
-//             }
-//         });
-//         return total;
-//     }, 0);
-// });
-
 productVariantSchema.virtual('sales').get(function () {
     const currentDate = new Date();
     const timeframeMap = {
@@ -123,7 +83,6 @@ productVariantSchema.virtual('sales').get(function () {
     }
 
     // Filter completed orders within the specified timeframe
-    console.log("this.completedOrders", this.completedOrders)
     const completedOrders = this.completedOrders.filter(
       (order) => order.createdAt >= timeframeDate
     );

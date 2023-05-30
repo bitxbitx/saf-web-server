@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Order = require('../../models/ecom/order.model');
+const Product = require('../../models/ecom/product.model');
 
 const createOrder = asyncHandler(async (req, res) => {
     const userId = req.userId;
@@ -9,8 +10,24 @@ const createOrder = asyncHandler(async (req, res) => {
 });
 
 const getOrder = asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id);
-    res.json({ order });
+    Order.findById(req.params.id)
+    .populate({
+        path: 'orderItems.productVariant',
+        model: 'ProductVariant',
+        populate: {
+            path: 'product',
+            model: 'Product'
+        }
+    })
+    .populate('promoCodeUsed')
+    .populate('customer')
+    .exec((err, order) => {
+        if (err) {
+            // handle error
+        }
+        res.json({ order });
+    });
+
 });
 
 const updateOrder = asyncHandler(async (req, res) => {

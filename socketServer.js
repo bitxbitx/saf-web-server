@@ -42,6 +42,30 @@ module.exports = (server) => {
       }
     })
 
+    socket.on('support:init', async (userId) => {
+      // Fetch all active ChatSession for this user id and return them through emitting 'init' event
+      const chatSessions = await ChatSession.find({
+        participants: userId,
+      }).populate('participants').populate('messages').exec();
+
+      // Add them to the clients object
+      clients[userId] = socket;
+
+      socket.emit('receive message', chatSessions);
+    })
+
+    socket.on('disconnect', () => {
+      console.log('Client disconnected');
+
+      // Remove them from the clients object
+      for (const userId in clients) {
+        if (clients[userId] === socket) {
+          delete clients[userId];
+          break;
+        }
+      }
+    })
+
     socket.on('send message', async ({ userId, message, sessionId }) => {
       // Fetch the ChatSession for this user id and return it through emitting 'receive message' event
       const chatSession = await ChatSession.findOne({

@@ -12,7 +12,6 @@ const calculateOrderAmount = (items, promoCode) =>  {
   });
   if (promoCode) {
     const decoded = JSON.parse(promoCode)
-    console.log(decoded);
     if (decoded) {
       // Check discount type
       if (decoded.discountType === 'percentage') {
@@ -62,9 +61,7 @@ const generateResponse = intent => {
 
 const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
   const { paymentMethodId, items, currency, useStripeSdk, promoCode } = req.body;
-console.log(req.body);
   const orderAmount = calculateOrderAmount(items, promoCode );
-console.log(orderAmount);
   try {
     let intent;
     if (paymentMethodId) {
@@ -81,6 +78,7 @@ console.log(orderAmount);
     } else if (paymentIntentId) {
       // Confirm the PaymentIntent to finalize payment after handling a required action
       // on the client.
+      console.log("Confirming payment intent");
       intent = await stripe.paymentIntents.confirm(paymentIntentId);
       // After confirm, if the PaymentIntent's status is succeeded, fulfill the order.
     }
@@ -91,7 +89,6 @@ console.log(orderAmount);
       const orderItems = [];
       items.forEach(item => {
         const decoded = JSON.parse(item.productVariant);
-        console.log(decoded);
         orderItems.push({
           "productVariant" : decoded.id,
           quantity : item.quantity,
@@ -102,18 +99,16 @@ console.log(orderAmount);
         orderItems : orderItems,
         totalPrice : orderAmount,
        });
-      console.log(order);
       await order.save();
 
       // Update Product Variant
-      items.forEach(item => {
+      items.forEach(async item => {
         const decoded = JSON.parse(item.productVariant);
-        const product = ProductVariant.findById(decoded.id);
-        product.stock = product.stock - item.quantity;
-        product.save();
+        const productVariant = await ProductVariant.findById(decoded.id).exec();
+        productVariant.stock = productVariant.stock - item.quantity;
+        productVariant.save();
       });
     }
-    console.log(generateResponse(intent));
     res.send(generateResponse(intent));
   }
   catch (e) {

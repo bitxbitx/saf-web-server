@@ -64,8 +64,9 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
-    const product = await Product.findOneAndDelete({ _id: req.params.id });
-    res.json({ message: 'Product removed' });
+  const product = await Product.findOneAndDelete({ _id: req.params.id });
+  await ProductVariant.deleteMany({ product: req.params.id }); // delete all product variants related to the product being deleted
+  res.json({ message: 'Product removed' });
 });
 
 module.exports = { createProduct, getProducts, getProduct, updateProduct, deleteProduct };
