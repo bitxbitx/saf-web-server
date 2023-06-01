@@ -6,6 +6,7 @@ require('dotenv').config();
 const createProduct = asyncHandler(async (req, res) => {
     const imagePaths = [];
     // Check if any files were uploaded
+    console.log("req.files", req.files)
     if (req.files && req.files.length > 0) {
       // Iterate through each uploaded file
       req.files.forEach((file) => {
@@ -39,8 +40,12 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-    
+    console.log("req.body", req.body)
+    console.log("typeof req.body.images", typeof req.body.images)
+    if ( typeof  req.body.images === 'string' ) { req.body.images = JSON.parse(req.body.images) } 
+    console.log("req.body.images", req.body.images)
     const imagePaths = req.body.images || [];
+    console.log("req.files", req.files)
     // Check if any files were uploaded
     if (req.files && req.files.length > 0) {
       // Iterate through each uploaded file

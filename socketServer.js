@@ -72,6 +72,8 @@ module.exports = (server) => {
         _id: sessionId,
       }).populate('participants').populate('messages').exec();
 
+      console.log('chatSession', chatSession)
+
       // Save the message to the database
       const chatMessage = await ChatMessage.create({
         sender: userId,
@@ -184,7 +186,7 @@ module.exports = (server) => {
 
       // Update the ChatSession in the database
       const chatSession = await ChatSession.findById(sessionId).populate('participants').populate('messages').exec();
-      chatSession.status = 'closed';
+      chatSession.status = 'closed';  
       await chatSession.save();
 
       // Emit an event to the other participant to update their list of chat sessions

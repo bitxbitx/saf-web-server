@@ -36,6 +36,7 @@ const promoCodeSchema = Schema(
         minPurchaseAmount: Number,
         maxDiscountAmount: Number,
         maxUsesPerUser: Number,
+        image: String,
     },
     {
         timestamps: true,

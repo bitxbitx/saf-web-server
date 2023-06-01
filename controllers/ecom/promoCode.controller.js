@@ -3,13 +3,21 @@ const PromoCode = require('../../models/ecom/promoCode.model');
 const ProductCategory = require('../../models/ecom/productCategory.model');
 
 const createPromoCode = asyncHandler(async (req, res) => {
+    // console.log(req.body);
+    if (req.file) { req.body.image = process.env.SERVER_URL + req.file.path }
+
+    // Change string to JSON for productCategory
+    req.body.productCategory = JSON.parse(req.body.productCategory);
+
+    // Extract only the _id
+    req.body.productCategory = req.body.productCategory.map((item) => item._id);
+
     const promoCode = new PromoCode(req.body);
     await promoCode.save();
-    console.log(promoCode);
 
     const brofkthisshit = await PromoCode.findById(promoCode._id.toString()).populate('productCategory');
-    
-    res.json({ promoCode:brofkthisshit});
+
+    res.json({ promoCode: brofkthisshit });
 });
 
 const getPromoCodes = asyncHandler(async (req, res) => {
@@ -23,9 +31,15 @@ const getPromoCode = asyncHandler(async (req, res) => {
 });
 
 const updatePromoCode = asyncHandler(async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
+    if (req.file) { req.body.image = process.env.SERVER_URL + req.file.path }
+
+    // Change string to JSON for productCategory
+    req.body.productCategory = JSON.parse(req.body.productCategory);
+
+    // Extract only the _id
+    req.body.productCategory = req.body.productCategory.map((item) => item._id);
     const promoCode = await PromoCode.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true }).populate('productCategory');
-    console.log(promoCode);
     res.json({ promoCode });
 });
 

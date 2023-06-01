@@ -31,7 +31,7 @@ const getOrder = asyncHandler(async (req, res) => {
 });
 
 const updateOrder = asyncHandler(async (req, res) => {
-    const order = await Order.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true });
+    const order = await Order.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true }).populate('customer').populate('promoCodeUsed');
     res.json({ order });
 });
 
@@ -41,7 +41,7 @@ const deleteOrder = asyncHandler(async (req, res) => {
 });
 
 const getOrders = asyncHandler(async (req, res) => {
-    const orders = await Order.find({});
+    const orders = await Order.find({}).populate('customer').populate('promoCodeUsed');
     res.json({ orders });
 });
 
