@@ -69,7 +69,7 @@ app.use('/api/wishlist', require('./routes/ecom/wishlist.routes'));
 app.use('/api/statistics', require('./routes/statistics/statistics.routes'));
 
 // Fetch Image
-app.use('/uploads', express.static('uploads'));
+app.use('/api/uploads', express.static('uploads'));
 
 // Payment Routes
 app.use('/api/payment', require('./routes/payment/payment.routes.js'));
