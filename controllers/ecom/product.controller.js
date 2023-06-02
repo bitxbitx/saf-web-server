@@ -9,7 +9,7 @@ const createProduct = asyncHandler(async (req, res) => {
   if (req.files && req.files.length > 0) {
     // Iterate through each uploaded file
     req.files.forEach((file) => {
-      imagePaths.push(process.env.SERVER_URL + file.path);
+      imagePaths.push(process.env.SERVER_URL + '/api/' + file.path);
     });
   }
 
@@ -50,7 +50,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   if (req.files && req.files.length > 0) {
     // Iterate through each uploaded file
     req.files.forEach((file) => {
-      imagePaths.push(process.env.SERVER_URL + file.path);
+      imagePaths.push(process.env.SERVER_URL + '/api/' +  file.path);
     });
   }
 
