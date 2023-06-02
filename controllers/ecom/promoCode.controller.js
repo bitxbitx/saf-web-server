@@ -4,7 +4,7 @@ const ProductCategory = require('../../models/ecom/productCategory.model');
 
 const createPromoCode = asyncHandler(async (req, res) => {
     // console.log(req.body);
-    if (req.file) { req.body.image = process.env.SERVER_URL + '/api/' +  req.file.path }
+    if (req.file) { req.body.image = process.env.SERVER_URL + 'api/' +  req.file.path }
 
     // Change string to JSON for productCategory
     req.body.productCategory = JSON.parse(req.body.productCategory);
@@ -32,7 +32,7 @@ const getPromoCode = asyncHandler(async (req, res) => {
 
 const updatePromoCode = asyncHandler(async (req, res) => {
     // console.log(req.body);
-    if (req.file) { req.body.image = process.env.SERVER_URL +  '/api/' + req.file.path }
+    if (req.file) { req.body.image = process.env.SERVER_URL +  'api/' + req.file.path }
 
     // Change string to JSON for productCategory
     req.body.productCategory = JSON.parse(req.body.productCategory);
