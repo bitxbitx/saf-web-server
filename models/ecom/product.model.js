@@ -33,6 +33,9 @@ const productSchema = mongoose.Schema(
             type: String,
             enum: ['simple', 'variable'],
             default: 'simple',
+        },
+        platform: {
+            type: String,
         }
     },
     {
@@ -65,11 +68,6 @@ productSchema.virtual('addToCartCount', {
     localField: '_id',
     foreignField: 'product',
     count: true,
-    match: {
-        createdAt: {
-            $gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
-        },
-    },
 });
 
 productSchema.virtual('productVariant', {
@@ -84,11 +82,6 @@ productSchema.virtual('wishlistCount', {
     localField: '_id',
     foreignField: 'product',
     count: true,
-    match: {
-        createdAt: {
-            $gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
-        },
-    },
 });
 
 module.exports = mongoose.model('Product', productSchema);

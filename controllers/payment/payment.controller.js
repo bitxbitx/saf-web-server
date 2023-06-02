@@ -4,7 +4,7 @@ const Order = require('../../models/ecom/order.model');
 const PromoCode = require('../../models/ecom/promoCode.model');
 const ProductVariant = require('../../models/ecom/productVariant.model');
 
-const calculateOrderAmount = (items, promoCode) =>  {
+const calculateOrderAmount = (items, promoCode) => {
   total = 0;
   items.forEach(item => {
     const decoded = JSON.parse(item.productVariant);
@@ -22,7 +22,7 @@ const calculateOrderAmount = (items, promoCode) =>  {
     }
   }
 
-  return total*100;
+  return total * 100;
 };
 
 const generateResponse = intent => {
@@ -61,7 +61,7 @@ const generateResponse = intent => {
 
 const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
   const { paymentMethodId, items, currency, useStripeSdk, promoCode } = req.body;
-  const orderAmount = calculateOrderAmount(items, promoCode );
+  const orderAmount = calculateOrderAmount(items, promoCode);
   try {
     let intent;
     if (paymentMethodId) {
@@ -84,31 +84,37 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
     }
 
     if (intent.status === 'succeeded') {
-      const userId = req.userId;
-      // Extract Product variant from items
-      const orderItems = [];
-      items.forEach(item => {
-        const decoded = JSON.parse(item.productVariant);
-        orderItems.push({
-          "productVariant" : decoded.id,
-          quantity : item.quantity,
-        });          
-      });
-      const order = new Order({ 
-        customer : userId,
-        orderItems : orderItems,
-        totalPrice : orderAmount,
-       });
-      await order.save();
+      try {
+        const userId = req.userId;
+        // Extract Product variant from items
+        const orderItems = [];
+        items.forEach(item => {
+          const decoded = JSON.parse(item.productVariant);
+          orderItems.push({
+            "productVariant": decoded.id,
+            quantity: item.quantity,
+          });
+        });
+        const order = new Order({
+          customer: userId,
+          orderItems: orderItems,
+          totalPrice: orderAmount,
+        });
+        await order.save();
 
-      // Update Product Variant
-      items.forEach(async item => {
-        const decoded = JSON.parse(item.productVariant);
-        const productVariant = await ProductVariant.findById(decoded.id).exec();
-        productVariant.stock = productVariant.stock - item.quantity;
-        productVariant.save();
-      });
+        // Update Product Variant
+        items.forEach(async item => {
+          const decoded = JSON.parse(item.productVariant);
+          const productVariant = await ProductVariant.findById(decoded.id).exec();
+          productVariant.stock = productVariant.stock - item.quantity;
+          productVariant.save();
+        });
+
+      } catch (error) {
+        console.log("Error creating order", error);
+      }
     }
+    console.log("generateResponse(intent), intent", generateResponse(intent), intent);
     res.send(generateResponse(intent));
   }
   catch (e) {

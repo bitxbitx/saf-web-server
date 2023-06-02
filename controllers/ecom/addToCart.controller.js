@@ -2,11 +2,11 @@ const asyncHandler = require('express-async-handler');
 const AddToCart = require('../../models/ecom/addToCart.model');
 
 const addToCart = asyncHandler(async (req, res) => {
-    const { productId, quantity } = req.body;
+    const { product, quantity, productVariant } = req.body;
     const userId = req.userId;
 
     // Check if it exist already by user and product
-    const cartExist = await AddToCart.find({ userId, productId });
+    const cartExist = await AddToCart.find({ userId, product, productVariant });
     if (cartExist.length > 0) {
         // Check if status is removed
         if (cartExist[0].status === 'removed') {
@@ -20,7 +20,7 @@ const addToCart = asyncHandler(async (req, res) => {
             res.json({ cart: cartExist[0] });
         }
     } else {
-        const cart = new AddToCart({ userId, productId, quantity });
+        const cart = new AddToCart({ user: userId, product, quantity, productVariant });
         await cart.save();
         res.json({ cart });
     }

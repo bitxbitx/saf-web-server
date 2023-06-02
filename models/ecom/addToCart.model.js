@@ -8,6 +8,11 @@ const AddToCartSchema = new mongoose.Schema({
     },
     product: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+    },
+    productVariant: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'ProductVariant',
         required: true,
     },

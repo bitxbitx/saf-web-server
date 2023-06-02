@@ -49,7 +49,7 @@ const productInsights = asyncHandler(async (req, res) => {
         path: 'productVariant',
         populate: { path: 'completedOrders' }
         
-    })
+    }).populate('wishlistCount');
     const timeframeDate = new Date(timeFrameInMillisecondsAgo);
     const productData = await Promise.all(products.map(async (product) => {
         const productVariantIds = product.productVariant.map((productVariant) => productVariant._id);
@@ -96,12 +96,8 @@ const productInsights = asyncHandler(async (req, res) => {
         }, 0);
       
         const sellThroughRate = totalNumberOfUnitsSold / (totalNumberOfUnitsInStock + totalNumberOfUnitsSold);
-      
-        const wishlistCount = await productVariantData.reduce(async (accumulator, productVariant) => {
-          productVariant.timeframeDate = timeframeDate;
-          var temp = await productVariant.wishlistCountWithinTimeframe;
-          return accumulator + temp;
-        }, 0);
+        
+        const wishlistCount = product.wishlistCount;
       
         const addToCartCount = await productVariantData.reduce(async (accumulator, productVariant) => {
           productVariant.timeframeDate = timeframeDate;

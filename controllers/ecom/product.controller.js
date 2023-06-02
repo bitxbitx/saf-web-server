@@ -4,68 +4,72 @@ const ProductVariant = require('../../models/ecom/productVariant.model');
 require('dotenv').config();
 
 const createProduct = asyncHandler(async (req, res) => {
-    const imagePaths = [];
-    // Check if any files were uploaded
-    console.log("req.files", req.files)
-    if (req.files && req.files.length > 0) {
-      // Iterate through each uploaded file
-      req.files.forEach((file) => {
-        imagePaths.push(process.env.SERVER_URL + file.path);
-      });
-    }
-  
-    // Assign the array of image paths to the req.body.images property
-    req.body.images = imagePaths;
-  
-    // Change string to JSON for productCategory
-    req.body.productCategory = JSON.parse(req.body.productCategory);
-  
-    // Extract only the _id
-    req.body.productCategory = req.body.productCategory.map((item) => item._id);
-  
-    const product = new Product(req.body);
-    await product.save();
-    res.json({ product });
-  });
+  const imagePaths = [];
+  // Check if any files were uploaded
+  if (req.files && req.files.length > 0) {
+    // Iterate through each uploaded file
+    req.files.forEach((file) => {
+      imagePaths.push(process.env.SERVER_URL + file.path);
+    });
+  }
+
+  if (typeof req.body.attributes === 'string') {
+    // Change string to JSON for attributes
+    req.body.attributes = JSON.parse(req.body.attributes);
+  }
+
+  // Assign the array of image paths to the req.body.images property
+  req.body.images = imagePaths;
+
+  // Change string to JSON for productCategory
+  req.body.productCategory = JSON.parse(req.body.productCategory);
+
+  // Extract only the _id
+  req.body.productCategory = req.body.productCategory.map((item) => item._id);
+
+  const product = new Product(req.body);
+  await product.save();
+  res.json({ product });
+});
 
 const getProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({}).populate('productVariant').populate('productCategory');
-    console.log(products)
-    res.json({ products });
+  const products = await Product.find({}).populate('productVariant').populate('productCategory');
+  res.json({ products });
 });
 
 const getProduct = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('productVariant').populate('productCategory');
-    res.json({ product });
+  const product = await Product.findById(req.params.id).populate('productVariant').populate('productCategory');
+  res.json({ product });
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-    console.log("req.body", req.body)
-    console.log("typeof req.body.images", typeof req.body.images)
-    if ( typeof  req.body.images === 'string' ) { req.body.images = JSON.parse(req.body.images) } 
-    console.log("req.body.images", req.body.images)
-    const imagePaths = req.body.images || [];
-    console.log("req.files", req.files)
-    // Check if any files were uploaded
-    if (req.files && req.files.length > 0) {
-      // Iterate through each uploaded file
-      req.files.forEach((file) => {
-        imagePaths.push(process.env.SERVER_URL + file.path);
-      });
-    }
+  if (typeof req.body.images === 'string') { req.body.images = JSON.parse(req.body.images) }
 
-  
-    // Assign the array of image paths to the req.body.images property
-    req.body.images = imagePaths;
-  
-    // Change string to JSON for productCategory
-    req.body.productCategory = JSON.parse(req.body.productCategory);
-  
-    // Extract only the _id
-    req.body.productCategory = req.body.productCategory.map((item) => item._id);
+  const imagePaths = req.body.images || [];
+  // Check if any files were uploaded
+  if (req.files && req.files.length > 0) {
+    // Iterate through each uploaded file
+    req.files.forEach((file) => {
+      imagePaths.push(process.env.SERVER_URL + file.path);
+    });
+  }
 
-    const product = await Product.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true });
-    res.json({ product });
+  if (typeof req.body.attributes === 'string') {
+    // Change string to JSON for attributes
+    req.body.attributes = JSON.parse(req.body.attributes);
+  }
+
+  // Assign the array of image paths to the req.body.images property
+  req.body.images = imagePaths;
+
+  // Change string to JSON for productCategory
+  req.body.productCategory = JSON.parse(req.body.productCategory);
+
+  // Extract only the _id
+  req.body.productCategory = req.body.productCategory.map((item) => item._id);
+
+  const product = await Product.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true });
+  res.json({ product });
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {

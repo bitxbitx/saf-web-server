@@ -17,11 +17,12 @@ const getOrder = asyncHandler(async (req, res) => {
         populate: {
             path: 'product',
             model: 'Product'
-        }
+        }   
     })
     .populate('promoCodeUsed')
     .populate('customer')
     .exec((err, order) => {
+        console.log(order);
         if (err) {
             // handle error
         }
@@ -41,8 +42,43 @@ const deleteOrder = asyncHandler(async (req, res) => {
 });
 
 const getOrders = asyncHandler(async (req, res) => {
-    const orders = await Order.find({}).populate('customer').populate('promoCodeUsed');
-    res.json({ orders });
+    const orders = await Order.find({}).populate({
+        path: 'orderItems.productVariant',
+        model: 'ProductVariant',
+        populate: {
+            path: 'product',
+            model: 'Product'
+        }   
+    })
+    .populate('promoCodeUsed')
+    .populate('customer')
+    .exec((err, orders) => {
+        if (err) {
+            // handle error
+        }
+        res.json({ orders });
+    });
+    // res.json({ orders });
 });
 
-module.exports = { createOrder, getOrder, updateOrder, deleteOrder, getOrders };
+const getOrdersByUser = asyncHandler(async (req, res) => {
+    const orders = await Order.find({ customer: req.userId }).populate({
+        path: 'orderItems.productVariant',
+        model: 'ProductVariant',
+        populate: {
+            path: 'product',
+            model: 'Product'
+        }   
+    })
+    .populate('promoCodeUsed')
+    .populate('customer')
+    .exec((err, orders) => {
+        if (err) {
+            // handle error
+        }
+        res.json({ orders });
+    });
+
+});
+
+module.exports = { createOrder, getOrder, updateOrder, deleteOrder, getOrders, getOrdersByUser };
