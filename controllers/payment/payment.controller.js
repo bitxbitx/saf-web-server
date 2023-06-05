@@ -90,8 +90,9 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
         const orderItems = [];
         items.forEach(item => {
           const decoded = JSON.parse(item.productVariant);
+
           orderItems.push({
-            "productVariant": decoded.id,
+            "productVariant": decoded._id,
             quantity: item.quantity,
           });
         });
@@ -105,7 +106,7 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
         // Update Product Variant
         items.forEach(async item => {
           const decoded = JSON.parse(item.productVariant);
-          const productVariant = await ProductVariant.findById(decoded.id).exec();
+          const productVariant = await ProductVariant.findById(decoded._id).exec();
           productVariant.stock = productVariant.stock - item.quantity;
           productVariant.save();
         });
@@ -113,8 +114,7 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
       } catch (error) {
         console.log("Error creating order", error);
       }
-    }
-    console.log("generateResponse(intent), intent", generateResponse(intent), intent);
+    }    
     res.send(generateResponse(intent));
   }
   catch (e) {

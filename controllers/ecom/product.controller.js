@@ -34,6 +34,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({}).populate('productVariant').populate('productCategory');
+  console.log("products", products[0].productVariant)
   res.json({ products });
 });
 
@@ -43,7 +44,22 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-  if (typeof req.body.images === 'string') { req.body.images = JSON.parse(req.body.images) }
+  console.log(req.body);
+  if (typeof req.body.images === 'string') {
+    try {
+      const parsedImages = JSON.parse(req.body.images);
+      if (Array.isArray(parsedImages) && parsedImages.every(item => typeof item === 'string')) {
+        req.body.images = parsedImages;
+      } else {
+        // Not an array of strings
+        // Handle the error or provide appropriate feedback
+      }
+    } catch (error) {
+      // Invalid JSON string
+      // Handle the error or provide appropriate feedback
+    }
+  }
+  
 
   const imagePaths = req.body.images || [];
   // Check if any files were uploaded

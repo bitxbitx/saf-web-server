@@ -4,9 +4,9 @@ const ProductVariant = require('../../models/ecom/productVariant.model');
 
 const createProductVariant = asyncHandler(async (req, res) => {
     console.log("req.body", req.body)
-    if (req.file) { req.body.image = req.file.path }
+
     // Change string to json for attributes
-    if (req.body.attributes) { req.body.attributes = JSON.parse(req.body.attributes) }
+    if (req.body.attributes && typeof req.body.attributes == 'string') { req.body.attributes = JSON.parse(req.body.attributes) }
 
     const productVariant = new ProductVariant(req.body);
     await productVariant.save();
@@ -25,9 +25,10 @@ const getProductVariant = asyncHandler(async (req, res) => {
 
 
 const updateProductVariant = asyncHandler(async (req, res) => {
-    if (req.file) { req.body.image = req.file.path }
-    
+    console.log("req.body", req.body)
+
     // Change string to json for attributes
+    if ( typeof req.body.attributes === 'string' )
     req.body.attributes = JSON.parse(req.body.attributes);
 
     const productVariant = await ProductVariant.findByIdAndUpdate(
