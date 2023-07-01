@@ -2,29 +2,33 @@ const mongoose = require('mongoose');
 
 const productVariantSchema = mongoose.Schema(
     {
-        product: {
+        article: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product',
+            ref: 'Article',
             required: true,
         },
-        attributes: {
-            type: Map,
-            of: String,
-            default: {}
-          },
+        size: {
+            type: String,
+            required: true,
+        },
+        // color: {
+        //     type: String,
+        //     required: true,
+        // },
         price: {
             type: Number,
             required: true,
         },
-        stock: {
+        // stock: {
+        //     type: Number,
+        // },
+        stockIntake: {
             type: Number,
-            required: true,
+            default: 0,
         },
-        image: {
-            type: String,
-        },
-        sku: {
-            type: String,
+        stockOuttake: {
+            type: Number,
+            default: 0,
         },
     },
     {
@@ -33,6 +37,10 @@ const productVariantSchema = mongoose.Schema(
         toObject: { virtuals: true },
     }
 );
+
+productVariantSchema.virtual('stock').get(function () {
+    return this.stockIntake - this.stockOuttake;
+});
 
 productVariantSchema.virtual('addToCartCount', {
     ref: 'AddToCart',

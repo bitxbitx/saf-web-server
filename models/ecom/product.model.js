@@ -10,29 +10,13 @@ const productSchema = mongoose.Schema(
         images: [{
             type: String,
         }],
-        productCategory: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'ProductCategory',
-        }],
-        // Example of attributes
-        // attributes: {
-        //   color: 'red|blue|green',
-        //   size: 'M|L|XL',
-        // }
-        attributes: {
-            type: Map,
-            of: String,
-        },
-        // productDetails: String,
         status: {
             type: String,
-            enum: ['active', 'archived', 'closed'],
+            enum: ['active', 'inactive', 'closed'],
             default: 'active',
         },
-        productType: {
+        category: {
             type: String,
-            enum: ['simple', 'variable'],
-            default: 'simple',
         },
         platform: {
             type: String,
@@ -45,43 +29,34 @@ const productSchema = mongoose.Schema(
     }
 );
 
-productSchema.virtual('totalInventoryStock', {
-    ref: 'ProductVariant',
-    localField: '_id',
-    foreignField: 'product',
-    pipeline: [
-        {
-            $group: {
-                _id: '$product',
-                totalInventoryStock: {
-                    $sum: '$inventoryStock',
-                },
-            },
-        },
-    ],
-    justOne: true,
-});
-
-
-productSchema.virtual('addToCartCount', {
-    ref: 'AddToCart',
-    localField: '_id',
-    foreignField: 'product',
-    count: true,
-});
-
-productSchema.virtual('productVariant', {
-    ref: 'ProductVariant',
+productSchema.virtual('articles', {
+    ref: 'Article',
     localField: '_id',
     foreignField: 'product',
 });
 
+// productSchema.virtual('completedOrders').get(function () {
+//     return this.articles.reduce((acc, article) => {
+//         return acc + article.completedOrders.length;
+//     }, 0);
+// });
 
-productSchema.virtual('wishlistCount', {
-    ref: 'Wishlist',
-    localField: '_id',
-    foreignField: 'product',
-    count: true,
-});
+// productSchema.virtual('addToCartCount').get(function () {
+//     return this.articles.reduce((acc, article) => {
+//         return acc + article.addToCartCount;
+//     }, 0);
+// });
+
+// productSchema.virtual('wishlistCount').get(function () {
+//     return this.articles.reduce((acc, article) => {
+//         return acc + article.wishlistCount;
+//     }, 0);
+// });
+
+// productSchema.virtual('totalInventoryStock').get(function () {
+//     return this.articles.reduce((acc, article) => {
+//         return acc + article.totalInventoryStock[0].totalInventoryStock;
+//     }, 0);
+// });
 
 module.exports = mongoose.model('Product', productSchema);
