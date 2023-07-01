@@ -20,6 +20,9 @@ const productSchema = mongoose.Schema(
         },
         platform: {
             type: String,
+        },
+        productLink:{
+            type: String,
         }
     },
     {
