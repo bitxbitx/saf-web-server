@@ -52,11 +52,16 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({})
-    .populate('articles')
+    .populate({
+      path: 'articles',
+      populate: {
+        path: 'productVariants',
+      },
+    });
   // .populate('articles.productVariants');
   res.json({ products });
 });
-
+  
 const getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id)
     .populate({
@@ -138,12 +143,12 @@ const updateProduct = asyncHandler(async (req, res) => {
             article: updatedArticle._id,
             ...productVariant,
           });
-        
+
           await productVariantObj.save();
-        
+
           return productVariantObj;
         }
-        
+
       });
 
       // Check if there is any product variant to deleted
