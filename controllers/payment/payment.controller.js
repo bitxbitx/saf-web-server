@@ -107,7 +107,7 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
         items.forEach(async item => {
           const decoded = JSON.parse(item.productVariant);
           const productVariant = await ProductVariant.findById(decoded._id).exec();
-          productVariant.stock = productVariant.stock - item.quantity;
+          productVariant.stockOuttake -= item.quantity;
           productVariant.save();
         });
 
