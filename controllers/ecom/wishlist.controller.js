@@ -30,16 +30,17 @@ const getWishlists = asyncHandler(async (req, res) => {
 });
 
 const getWishlistByUser = asyncHandler(async (req, res) => {
-    const wishlists = await Wishlist.find({ user: req.params.id }).populate({
+    const wishlists = await Wishlist.find({ user: req.params.id })
+      .populate({
         path: 'product',
-        model: 'Product',
         populate: {
-            path: 'productVariant',
-            model: 'productVariant'
-        }
-    })
-    console.log("Wishlists: ", wishlists)
+          path: 'articles',
+          populate: {
+            path: 'productVariants',
+          },
+        },
+      });
+    console.log("Wishlists: ", wishlists);
     res.json({ wishlists });
-});
-
+  });
 module.exports = { createWishlist, getWishlist, updateWishlist, deleteWishlist, getWishlists, getWishlistByUser };
