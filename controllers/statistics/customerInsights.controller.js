@@ -1,6 +1,93 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../../models/user.model');
 const Order = require('../../models/ecom/order.model');
+/**
+ * @swagger
+ * tags:
+ *   name: Ecommerce - Analytics
+ *   description: Ecommerce customer insights
+ * components:
+ *   schemas:
+ *     CustomerInsightsResponse:
+ *       type: object
+ *       properties:
+ *         newVsReturningCustomers:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 example: "New"
+ *               count:
+ *                 type: number
+ *                 example: 100
+ *           example:
+ *             - _id: "New"
+ *               count: 100
+ *             - _id: "Returning"
+ *               count: 50
+ *         customerAgeDistribution:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 example: "0-10"
+ *               count:
+ *                 type: number
+ *                 example: 20
+ *           example:
+ *             - _id: "0-10"
+ *               count: 20
+ *             - _id: "11-20"
+ *               count: 30
+ *         ethnicityDistribution:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 example: "Chinese"
+ *               count:
+ *                 type: number
+ *                 example: 50
+ *           example:
+ *             - _id: "Chinese"
+ *               count: 50
+ *             - _id: "Malay"
+ *               count: 30
+ */
+
+/**
+ * @swagger
+ * /api/ecom/customer-insights:
+ *   get:
+ *     summary: Get customer insights data
+ *     tags: [Ecommerce - Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: timeFrame
+ *         schema:
+ *           type: string
+ *           example: "7d"
+ *           enum: ["7d", "30d", "90d", "365d", "all"]
+ *         required: true
+ *         description: Time frame for the customer insights data
+ *     responses:
+ *       '200':
+ *         description: Customer insights data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CustomerInsightsResponse'
+ *       '500':
+ *         description: Internal server error
+ */
 
 const customerInsights = asyncHandler(async (req, res) => {
     /**

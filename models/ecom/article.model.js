@@ -1,5 +1,43 @@
 const mongoose = require('mongoose');
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *   Article:
+ *     type: object
+ *     properties:
+ *       _id:
+ *         type: string
+ *         description: Article ID
+ *         example: "611fda05f2d63e001bbcc7a1"
+ *       articleNo:
+ *         type: string
+ *         description: Article number
+ *         example: "ART123"
+ *       color:
+ *         type: string
+ *         description: Color of the article
+ *         example: "Blue"
+ *       product:
+ *         type: string
+ *         description: ID of the product associated with the article
+ *         example: "611fda05f2d63e001bbcc7a1"
+ *       totalInventoryStock:
+ *         type: integer
+ *         description: Total inventory stock for the article's product
+ *         example: 50
+ *       productVariants:
+ *         type: array
+ *         description: List of product variants associated with the article
+ *         items:
+ *           $ref: '#/components/schemas/ProductVariant'
+ *     required:
+ *       - articleNo
+ *       - color
+ *       - product
+ */
+
 const articleSchema = mongoose.Schema(
   {
     articleNo: {

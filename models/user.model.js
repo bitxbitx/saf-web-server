@@ -2,6 +2,85 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *   User:
+ *     type: object
+ *     properties:
+ *       _id:
+ *         type: string
+ *         description: User ID
+ *         example: "611fda05f2d63e001bbcc7a1"
+ *       name:
+ *         type: string
+ *         description: Name of the user
+ *         example: Arthur Dent
+ *       email:
+ *         type: string
+ *         description: Email address of the user
+ *         example: arthur@example.com
+ *       username:
+ *         type: string
+ *         description: Username of the user
+ *         example: arthur42
+ *       password:
+ *         type: string
+ *         description: Password of the user
+ *       role:
+ *         type: string
+ *         enum:
+ *           - "Admin"
+ *           - "User"
+ *           - "Customer"
+ *           - "Manager"
+ *           - "Staff"
+ *           - "Delivery"
+ *           - "Driver"
+ *           - "Rider"
+ *           - "Sales"
+ *           - "Marketing"
+ *           - "Finance"
+ *           - "Accounting"
+ *           - "HR"
+ *           - "IT"
+ *           - "Support"
+ *           - "Guest"
+ *         description: User role (Admin, User, etc.)
+ *         example: "User"
+ *       dob:
+ *         type: string
+ *         format: date
+ *         description: Date of birth of the user
+ *         example: "1990-01-01"
+ *       ethnicity:
+ *         type: string
+ *         enum:
+ *           - "Malay"
+ *           - "Chinese"
+ *           - "Indian"
+ *           - "Others"
+ *         description: Ethnicity of the user
+ *         example: "Malay"
+ *       phoneNumber:
+ *         type: string
+ *         description: Phone number of the user
+ *         example: "1234567890"
+ *       address:
+ *         type: string
+ *         description: Address of the user
+ *         example: "123 Main Street"
+ *       image:
+ *         type: string
+ *         description: URL to the user's image
+ *         example: "https://example.com/images/arthur.jpg"
+ *       points:
+ *         type: integer
+ *         description: User points
+ *         example: 100
+ */
+
 const userSchema = mongoose.Schema(
     {
         name: {

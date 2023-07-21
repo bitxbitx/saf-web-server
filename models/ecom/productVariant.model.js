@@ -1,5 +1,72 @@
 const mongoose = require('mongoose');
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *   ProductVariant:
+ *     type: object
+ *     properties:
+ *       _id:
+ *         type: string
+ *         description: ProductVariant ID
+ *         example: "611fda05f2d63e001bbcc7a1"
+ *       article:
+ *         type: string
+ *         description: ID of the article associated with the product variant
+ *         example: "611fda05f2d63e001bbcc7a1"
+ *       size:
+ *         type: string
+ *         description: Size of the product variant
+ *         example: "Medium"
+ *       price:
+ *         type: number
+ *         description: Price of the product variant
+ *         example: 49.99
+ *       stock:
+ *         type: number
+ *         description: Current stock quantity of the product variant (calculated as stockIntake - stockOuttake)
+ *         example: 100
+ *       addToCartCount:
+ *         type: number
+ *         description: Number of times the product variant has been added to cart within the specified timeframe
+ *         example: 10
+ *       completedOrders:
+ *         type: array
+ *         description: List of completed orders associated with the product variant within the specified timeframe
+ *         items:
+ *           $ref: '#/components/schemas/Order'
+ *       orders:
+ *         type: array
+ *         description: List of orders associated with the product variant excluding cancelled orders within the specified timeframe
+ *         items:
+ *           $ref: '#/components/schemas/Order'
+ *       wishlistCount:
+ *         type: number
+ *         description: Number of times the product variant has been added to wishlists
+ *         example: 5
+ *       sales:
+ *         type: number
+ *         description: Total sales amount of the product variant within the specified timeframe
+ *         example: 1000
+ *       quantitySold:
+ *         type: number
+ *         description: Total quantity of the product variant sold within the specified timeframe
+ *         example: 20
+ *       addToCartCountWithinTimeframe:
+ *         type: number
+ *         description: Number of times the product variant has been added to cart within the specified timeframe
+ *         example: 5
+ *       wishlistCountWithinTimeframe:
+ *         type: number
+ *         description: Number of times the product variant has been added to wishlists within the specified timeframe
+ *         example: 2
+ *     required:
+ *       - article
+ *       - size
+ *       - price
+ *     # Add other required properties if applicable
+ */
 const productVariantSchema = mongoose.Schema(
     {
         article: {

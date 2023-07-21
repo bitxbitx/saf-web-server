@@ -2,7 +2,108 @@ const asyncHandler = require('express-async-handler');
 const Order = require('../../models/ecom/order.model');
 const Product = require('../../models/ecom/product.model');
 const ProductVariant = require('../../models/ecom/productVariant.model');
+/**
+ * @swagger
+ * tags:
+ *   name: Ecommerce - Analytics
+ *   description: Ecommerce product insights
+ * components:
+ *   schemas:
+ *     ProductInsightsResponse:
+ *       type: object
+ *       properties:
+ *         productData:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               product:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: "product_id"                  
+ *               category:
+ *                 type: string
+ *                 example: "Electronics"
+ *               totalSales:
+ *                 type: number
+ *                 example: 5000
+ *               totalNumberOfOrders:
+ *                 type: number
+ *                 example: 50
+ *               totalNumberOfUnitsSold:
+ *                 type: number
+ *                 example: 200
+ *               totalNumberOfUnitsInStock:
+ *                 type: number
+ *                 example: 300
+ *               sellThroughRate:
+ *                 type: number
+ *                 example: 0.67
+ *               wishlistCount:
+ *                 type: number
+ *                 example: 10
+ *               addToCartCount:
+ *                 type: number
+ *                 example: 20
+ *           example:
+ *             - product:
+ *                 _id: "product_id_1"
+ *               category: "Electronics"
+ *               totalSales: 5000
+ *               totalNumberOfOrders: 50
+ *               totalNumberOfUnitsSold: 200
+ *               totalNumberOfUnitsInStock: 300
+ *               sellThroughRate: 0.67
+ *               wishlistCount: 10
+ *               addToCartCount: 20
+ *             - product:
+ *                 _id: "product_id_2"
+ *               category: "Clothing"
+ *               totalSales: 3000
+ *               totalNumberOfOrders: 30
+ *               totalNumberOfUnitsSold: 150
+ *               totalNumberOfUnitsInStock: 200
+ *               sellThroughRate: 0.75
+ *               wishlistCount: 5
+ *               addToCartCount: 15
+ */
 
+/**
+ * @swagger
+ * /api/ecom/product-insights:
+ *   get:
+ *     summary: Get product insights data
+ *     tags: [Ecommerce - Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: timeFrame
+ *         schema:
+ *           type: string
+ *           example: "7d"
+ *           enum: ["7d", "30d", "90d", "365d", "all"]
+ *         required: true
+ *         description: Time frame for the product insights data
+ *       - in: query
+ *         name: productCategory
+ *         schema:
+ *           type: string
+ *           example: "Electronics"
+ *         required: true
+ *         description: Product category for filtering the products
+ *     responses:
+ *       '200':
+ *         description: Product insights data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductInsightsResponse'
+ *       '500':
+ *         description: Internal server error
+ */
 const productInsights = asyncHandler(async (req, res) => {
   /**
    * Generate statistics data to display on the front end

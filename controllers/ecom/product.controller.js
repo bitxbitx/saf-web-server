@@ -4,6 +4,93 @@ const ProductVariant = require('../../models/ecom/productVariant.model');
 const Article = require('../../models/ecom/article.model');
 require('dotenv').config();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Ecommerce - Product
+ *   description: Ecommerce product management
+ * components:
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: "Product Name"
+ *         description:
+ *           type: string
+ *           example: "Product Description"
+ *         price:
+ *           type: number
+ *           example: 100.50
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *             example: ["image_url_1", "image_url_2"]
+ *         articles:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Article Title"
+ *               content:
+ *                 type: string
+ *                 example: "Article Content"
+ *               productVariants:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: "Variant Name"
+ *                     price:
+ *                       type: number
+ *                       example: 50.00
+ *                     stockIntake:
+ *                       type: integer
+ *                       example: 100
+ *     ProductResponse:
+ *       type: object
+ *       properties:
+ *         product:
+ *           $ref: '#/components/schemas/Product'
+ *     ProductsResponse:
+ *       type: object
+ *       properties:
+ *         products:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Product'
+ */
+
+/**
+ * @swagger
+ * /api/ecom/products:
+ *   post:
+ *     summary: Create a new product
+ *     tags: [Ecommerce - Product]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       '200':
+ *         description: Product created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductResponse'
+ *       '500':
+ *         description: Internal server error
+ */
 const createProduct = asyncHandler(async (req, res) => {
   console.log("req.body", req.body);
   const imagePaths = [];
@@ -50,6 +137,24 @@ const createProduct = asyncHandler(async (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /api/ecom/products:
+ *   get:
+ *     summary: Get all products
+ *     tags: [Ecommerce - Product]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: List of all products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductsResponse'
+ *       '500':
+ *         description: Internal server error
+ */
 const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({})
     .populate({
@@ -62,6 +167,31 @@ const getProducts = asyncHandler(async (req, res) => {
   res.json({ products });
 });
   
+/**
+ * @swagger
+ * /api/ecom/products/{id}:
+ *   get:
+ *     summary: Get a product by ID
+ *     tags: [Ecommerce - Product]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the product to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Product retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductResponse'
+ *       '500':
+ *         description: Internal server error
+ */
 const getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id)
     .populate({
@@ -73,6 +203,37 @@ const getProduct = asyncHandler(async (req, res) => {
   res.json({ product });
 });
 
+/**
+ * @swagger
+ * /api/ecom/products/{id}:
+ *   put:
+ *     summary: Update an existing product
+ *     tags: [Ecommerce - Product]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the product to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       '200':
+ *         description: Product updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductResponse'
+ *       '500':
+ *         description: Internal server error
+ */
 const updateProduct = asyncHandler(async (req, res) => {
   console.log("req.body", req.body);
   // Updating Product
@@ -193,6 +354,31 @@ const updateProduct = asyncHandler(async (req, res) => {
   res.json({ product });
 });
 
+/**
+ * @swagger
+ * /api/ecom/products/{id}:
+ *   delete:
+ *     summary: Delete a product by ID
+ *     tags: [Ecommerce - Product]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the product to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Product deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductResponse'
+ *       '500':
+ *         description: Internal server error
+ */
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findOneAndDelete({ _id: req.params.id });
   await ProductVariant.deleteMany({ product: req.params.id });

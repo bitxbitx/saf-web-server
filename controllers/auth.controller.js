@@ -5,12 +5,119 @@ const asyncHandler = require('express-async-handler');
 const { signAccessToken, signRefreshToken } = require('../config/jwtHelper');
 
 /**
- * Authenticates a user by email and password.
- * 
- * @route POST /api/auth/login
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @returns {Object} The user object with a JWT token.
+ * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: User authentication and account management
+ * components:
+ *  securitySchemes:
+ *    BearerAuth:
+ *      type: http
+ *      scheme: bearer
+ *      bearerFormat: JWT
+ *  schemas:
+ *   LoginRequest:
+ *     type: object
+ *     properties:
+ *       usernameEmailOrPhoneNumber:
+ *         type: string
+ *         example: "john_doe@example.com"
+ *       password:
+ *         type: string
+ *         example: "password123"
+ *   RegisterRequest:
+ *     type: object
+ *     properties:
+ *       name:
+ *         type: string
+ *         example: "John Doe"
+ *       email:
+ *         type: string
+ *         example: "john_doe@example.com"
+ *       password:
+ *         type: string
+ *         example: "password123"
+ *       role:
+ *         type: string
+ *         example: "User"
+ *       username:
+ *         type: string
+ *         example: "johndoe123"
+ *       phoneNumber:
+ *         type: string
+ *         example: "1234567890"
+ *   ForgotPasswordRequest:
+ *     type: object
+ *     properties:
+ *       email:
+ *         type: string
+ *         example: "john_doe@example.com"
+ *   ResetPasswordRequest:
+ *     type: object
+ *     properties:
+ *       password:
+ *         type: string
+ *         example: "newpassword123"
+ *   RefreshTokenRequest:
+ *     type: object
+ *     properties:
+ *       refreshToken:
+ *         type: string
+ *         example: "refresh_token_here"
+ *   UpdateDetailsRequest:
+ *     type: object
+ *     properties:
+ *       name:
+ *         type: string
+ *         example: "John Doe"
+ *       email:
+ *         type: string
+ *         example: "john_doe@example.com"
+ *       role:
+ *         type: string
+ *         example: "User"
+ *       username:
+ *         type: string
+ *         example: "johndoe123"
+ *       phoneNumber:
+ *         type: string
+ *         example: "1234567890"
+ */
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Authenticate user and return access and refresh tokens
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       '200':
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 accessToken:
+ *                   type: string
+ *                   description: JWT access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: JWT refresh token
+ *       '400':
+ *         description: Invalid username or password
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
  */
 const login = asyncHandler(async (req, res) => {
     const { usernameEmailOrPhoneNumber, password } = req.body;
@@ -37,22 +144,37 @@ const login = asyncHandler(async (req, res) => {
 });
 
 /**
- * Registers a new user user.
- * 
- * @route POST /api/auth/register
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @returns {Object} The created user object.
- * 
- * Example request body:
- * {
- *  "name": "John Doe",
- * "email": "stanley121499@gmail.com",
- * "password": "password",
- * "role": "user",
- * "username": "johndoe",
- * "phoneNumber": "1234567890"
- * }
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user and return access and refresh tokens
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RegisterRequest'
+ *     responses:
+ *       '200':
+ *         description: Successful registration
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 accessToken:
+ *                   type: string
+ *                   description: JWT access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: JWT refresh token
+ *       '400':
+ *         description: User already exists
+ *       '500':
+ *         description: Internal server error
  */
 const register = asyncHandler(async (req, res) => {
     const { name, email, password, role, username, phoneNumber } = req.body;
@@ -76,13 +198,34 @@ const register = asyncHandler(async (req, res) => {
     .json({ user, accessToken, refreshToken });
 });
 
+
 /**
- * Sends a password reset link to the user's email address.
- * 
- * @route POST /api/auth/reset-password
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @returns {Object} A success message indicating that the password reset link has been sent.
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Send a password reset link to user's email
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ForgotPasswordRequest'
+ *     responses:
+ *       '200':
+ *         description: Password reset link sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Password reset link has been sent
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
  */
 const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
@@ -110,12 +253,39 @@ const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 /**
- * Resets the user's password using a password reset link or token.
- * 
- * @route POST /api/auth/reset-password/:token
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @returns {Object} The updated user object.
+ * @swagger
+ * /api/auth/reset-password/{token}:
+ *   post:
+ *     summary: Reset user's password using a token from the reset link
+ *     tags: [Authentication]
+ *     parameters:
+ *       - name: token
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Password reset token received in email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResetPasswordRequest'
+ *     responses:
+ *       '200':
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Password reset successfully
+ *       '400':
+ *         description: Invalid token
+ *       '500':
+ *         description: Internal server error
  */
 const resetPassword = asyncHandler(async (req, res) => {
     const { password } = req.body;
@@ -133,15 +303,25 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 /**
- * Logout the user by destroying their session.
- * 
- * @route GET /api/auth/logout
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @returns {void}
- * @access Private
- * @description This route is used to logout the user by destroying their session.
-    */
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user and clear access and refresh tokens
+ *     tags: [Authentication]
+ *     responses:
+ *       '200':
+ *         description: Logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Logged out successfully
+ *       '500':
+ *         description: Internal server error
+ */
 const logout = asyncHandler(async (req, res) => {
     // remove all cookie
     res.clearCookie('refreshToken');
@@ -149,6 +329,39 @@ const logout = asyncHandler(async (req, res) => {
     res.json({ message: 'Logged out successfully' });
 });
 
+/**
+ * @swagger
+ * /api/auth/refresh-tokens:
+ *   post:
+ *     summary: Refresh access token using refresh token
+ *     tags: [Authentication]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RefreshTokenRequest'
+ *     responses:
+ *       '200':
+ *         description: Access token refreshed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: JWT access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: JWT refresh token
+ *       '401':
+ *         description: Refresh token missing or invalid
+ *       '500':
+ *         description: Internal server error
+ */
 const refreshTokens = asyncHandler(async (req, res) => {
     const authHeader = req.headers.authorization;
     const refreshTokenHeader = authHeader && authHeader.split(' ')[1];
@@ -182,6 +395,31 @@ const refreshTokens = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Get authenticated user's profile
+ *     tags: [Authentication]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: User profile data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '401':
+ *         description: Unauthorized, access token missing or invalid
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
 const getMe = asyncHandler(async (req, res) => {
     const userId = req.userId;
 
@@ -194,6 +432,37 @@ const getMe = asyncHandler(async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/auth/update-details:
+ *   put:
+ *     summary: Update authenticated user's profile details
+ *     tags: [Authentication]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateDetailsRequest'
+ *     responses:
+ *       '200':
+ *         description: Updated user profile data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '401':
+ *         description: Unauthorized, access token missing or invalid
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
 const updateDetails = asyncHandler(async (req, res) => {    
     const user = await User.findOneAndUpdate({_id: req.userId }, req.body, {new: true})
     if (!user) {

@@ -3,7 +3,46 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Order = require('../../models/ecom/order.model');
 const PromoCode = require('../../models/ecom/promoCode.model');
 const ProductVariant = require('../../models/ecom/productVariant.model');
-
+/**
+ * @swagger
+ * tags:
+ *   name: Ecommerce
+ *   description: Ecommerce payment management
+ * components:
+ *   schemas:
+ *     PaymentMethodIdRequestBody:
+ *       type: object
+ *       properties:
+ *         paymentMethodId:
+ *           type: string
+ *           example: "pm_card_visa" 
+ *         items:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               productVariant:
+ *                 type: string
+ *                 example: "{\"_id\":\"product_variant_id\",\"price\":10}" 
+ *               quantity:
+ *                 type: number
+ *                 example: 2
+ *         currency:
+ *           type: string
+ *           example: "usd" 
+ *         useStripeSdk:
+ *           type: boolean
+ *           example: true
+ *         promoCode:
+ *           type: string
+ *           example: "{\"_id\":\"promo_code_id\",\"discountType\":\"percentage\",\"discountAmount\":10}" 
+ *     PaymentIntentIdRequestBody:
+ *       type: object
+ *       properties:
+ *         paymentIntentId:
+ *           type: string
+ *           example: "pi_12345" 
+ */
 const calculateOrderAmount = (items, promoCode) => {
   total = 0;
   items.forEach(item => {
@@ -59,6 +98,43 @@ const generateResponse = intent => {
   }
 }
 
+/**
+ * @swagger
+ * /api/ecom/stripe-pay-method-id:
+ *   post:
+ *     summary: Create or confirm a PaymentIntent with a PaymentMethod ID
+ *     tags: [Ecommerce]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PaymentMethodIdRequestBody'
+ *     responses:
+ *       '200':
+ *         description: PaymentIntent created or confirmed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 requiresAction:
+ *                   type: boolean
+ *                   example: true
+ *                 clientSecret:
+ *                   type: string
+ *                   example: "pi_12345_secret_67890"
+ *                 status:
+ *                   type: string
+ *                   example: "requires_action"
+ *                 error:
+ *                   type: string
+ *                   example: "Your card was denied, please provide a new payment method"
+ *       '500':
+ *         description: Internal server error
+ */
 const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
   const { paymentMethodId, items, currency, useStripeSdk, promoCode } = req.body;
   const orderAmount = calculateOrderAmount(items, promoCode);
@@ -123,6 +199,44 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
     res.send({ error: e.message });
   }
 });
+
+/**
+ * @swagger
+ * /api/ecom/stripe-pay-intent-id:
+ *   post:
+ *     summary: Confirm a PaymentIntent with an Intent ID
+ *     tags: [Ecommerce]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PaymentIntentIdRequestBody'
+ *     responses:
+ *       '200':
+ *         description: PaymentIntent confirmed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 requiresAction:
+ *                   type: boolean
+ *                   example: true
+ *                 clientSecret:
+ *                   type: string
+ *                   example: "pi_12345_secret_67890"
+ *                 status:
+ *                   type: string
+ *                   example: "requires_action"
+ *                 error:
+ *                   type: string
+ *                   example: "Your card was denied, please provide a new payment method"
+ *       '500':
+ *         description: Internal server error
+ */
 
 const stripePayEndpointIntentId = asyncHandler(async (req, res) => {
   const { paymentIntentId } = req.body;

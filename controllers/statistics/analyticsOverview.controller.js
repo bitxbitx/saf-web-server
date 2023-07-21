@@ -2,6 +2,139 @@ const asyncHandler = require('express-async-handler');
 const Order = require('../../models/ecom/order.model');
 const ProductVariant = require('../../models/ecom/productVariant.model');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Ecommerce - Analytics
+ *   description: Ecommerce analytics management
+ * components:
+ *   schemas:
+ *     SalesLineChartData:
+ *       type: object
+ *       properties:
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["21/07/2023", "22/07/2023", "23/07/2023"]
+ *         datasets:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               label:
+ *                 type: string
+ *                 example: "Sales"
+ *               data:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *                 example: [100, 150, 200]
+ *               fill:
+ *                 type: boolean
+ *                 example: false
+ *               backgroundColor:
+ *                 type: string
+ *                 example: "rgba(75,192,192,0.2)"
+ *               borderColor:
+ *                 type: string
+ *                 example: "rgba(75,192,192,1)"
+ *     PricePointBarChartData:
+ *       type: object
+ *       properties:
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["MYR 10", "MYR 20", "MYR 30"]
+ *         datasets:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               label:
+ *                 type: string
+ *                 example: "Sales"
+ *               data:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *                 example: [50, 100, 150]
+ *               backgroundColor:
+ *                 type: string
+ *                 example: "rgba(75,192,192,0.2)"
+ *               borderColor:
+ *                 type: string
+ *                 example: "rgba(75,192,192,1)"
+ *               borderWidth:
+ *                 type: number
+ *                 example: 1
+ *     NumberOfOrdersBarChartData:
+ *       type: object
+ *       properties:
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["21/07/2023", "22/07/2023", "23/07/2023"]
+ *         datasets:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               label:
+ *                 type: string
+ *                 example: "Number of Orders"
+ *               data:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *                 example: [5, 10, 15]
+ *               backgroundColor:
+ *                 type: string
+ *                 example: "rgba(75,192,192,0.2)"
+ *               borderColor:
+ *                 type: string
+ *                 example: "rgba(75,192,192,1)"
+ *               borderWidth:
+ *                 type: number
+ *                 example: 1
+ */
+
+/**
+ * @swagger
+ * /api/ecom/analytics/overview:
+ *   get:
+ *     summary: Get overview analytics data
+ *     tags: [Ecommerce - Analytics]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: timeFrame
+ *         schema:
+ *           type: string
+ *           example: "7d"
+ *           enum: ["7d", "30d", "90d", "365d", "all"]
+ *         required: true
+ *         description: Time frame for the analytics data
+ *     responses:
+ *       '200':
+ *         description: Overview analytics data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 salesLineChartData:
+ *                   $ref: '#/components/schemas/SalesLineChartData'
+ *                 pricePointBarChartData:
+ *                   $ref: '#/components/schemas/PricePointBarChartData'
+ *                 numberOfOrdersBarChartData:
+ *                   $ref: '#/components/schemas/NumberOfOrdersBarChartData'
+ *       '500':
+ *         description: Internal server error
+ */
 
 const analyticsOverview = asyncHandler(async (req, res) => {
     /**
