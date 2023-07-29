@@ -36,7 +36,15 @@ const bcrypt = require("bcrypt");
  *                 properties:
  *                   user:
  *                     $ref: '#/components/schemas/User'
- * 
+ *         '404':
+ *           description: User not found
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
  */
 
 const getUser = asyncHandler(async (req, res) => {
@@ -47,13 +55,12 @@ const getUser = asyncHandler(async (req, res) => {
     res.status(404).json({ error: "User not found" });
   }
 });
-
 /**
  * @swagger
  * paths:
  *   /users/{id}:
- *     put:
- *       summary: Update a user by ID
+ *     get:
+ *       summary: Get a user by ID
  *       tags: [Users]
  *       parameters:
  *         - in: path
@@ -62,14 +69,6 @@ const getUser = asyncHandler(async (req, res) => {
  *             type: string
  *           required: true
  *           description: User ID
- *         - in: formData
- *           name: image
- *           type: file
- *           description: User profile image
- *         - in: formData
- *           name: password
- *           type: string
- *           description: User password (plain text)
  *       responses:
  *         '200':
  *           description: Successful operation
@@ -80,17 +79,8 @@ const getUser = asyncHandler(async (req, res) => {
  *                 properties:
  *                   user:
  *                     $ref: '#/components/schemas/User'
- *         '400':
- *           description: Bad request - validation error or duplicate key error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   error:
- *                     type: string
- *         '500':
- *           description: Internal server error
+ *         '404':
+ *           description: User not found
  *           content:
  *             application/json:
  *               schema:
@@ -99,7 +89,6 @@ const getUser = asyncHandler(async (req, res) => {
  *                   error:
  *                     type: string
  */
-
 const updateUser = asyncHandler(async (req, res) => {
   try {
     if (req.file) {
@@ -135,7 +124,6 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 /**
  * @swagger
  * paths:
@@ -160,13 +148,30 @@ const updateUser = asyncHandler(async (req, res) => {
  *                 properties:
  *                   message:
  *                     type: string
+ *         '404':
+ *           description: User not found
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *         '500':
+ *           description: Internal server error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
  */
 
 const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findOneAndDelete({ _id: req.params.id });
   res.json({ message: "User removed" });
 });
-
 /**
  * @swagger
  * paths:
@@ -186,13 +191,21 @@ const deleteUser = asyncHandler(async (req, res) => {
  *                     type: array
  *                     items:
  *                       $ref: '#/components/schemas/User'
+ *         '500':
+ *           description: Internal server error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
  */
 
 const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find({});
   res.json({ users });
 });
-
 /**
  * @swagger
  * paths:
