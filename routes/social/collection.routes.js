@@ -16,7 +16,16 @@ const storage = multer.diskStorage({
     cb(null, "uploads/collections");
   },
   filename: function (req, file, cb) {
-    cb(null, uuid.v4());
+    // Get the file extension
+    const fileExtension = file.originalname.split('.').pop();
+    
+    // Generate a UUID for the file name without spaces
+    const fileNameWithoutSpaces = uuid.v4().replace(/-/g, '');
+
+    // Combine the UUID and the file extension
+    const finalFileName = fileNameWithoutSpaces + '.' + fileExtension;
+
+    cb(null, finalFileName);
   },
 });
 

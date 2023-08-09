@@ -97,7 +97,7 @@ CollectionSchema.virtual("photo_count").get(function () {
   for (let i = 0; i < this.medias.length; i++) {
     const media = this.medias[i];
     const extension = media.split(".").pop();
-    if (extension === "jpg" || extension === "png") {
+    if (extension === "jpg" || extension === "png" || extension === "jpeg" || extension === "gif" || extension === "webp" || extension === "bmp") {
       count++;
     }
   }

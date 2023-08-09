@@ -87,6 +87,10 @@ const mongoose = require("mongoose");
  */
 const PostSchema = new mongoose.Schema(
   {
+    name:{
+      type: String,
+      required: true,
+    },
     platform: {
       type: String,
       enum: ["Facebook", "Shopee", "Instagram", "Lazada", "Twitter"],
