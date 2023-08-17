@@ -83,6 +83,12 @@ const CollectionSchema = new Schema(
         ref: "Post",
       },
     ],
+    captionedPosts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -121,6 +127,10 @@ CollectionSchema.virtual("video_count").get(function () {
 CollectionSchema.pre(/^find/, function (next) {
   this.populate({
     path: "posts",
+    select: "-__v",
+  })
+  .populate({
+    path: "captionedPosts",
     select: "-__v",
   });
   next();

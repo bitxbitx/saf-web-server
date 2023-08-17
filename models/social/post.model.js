@@ -107,7 +107,9 @@ const PostSchema = new mongoose.Schema(
     },
     caption: {
       type: String,
-      required: true,
+    },
+    season: {
+      type: String,
     },
     selectedMedias: [
       {
