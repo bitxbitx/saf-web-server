@@ -243,6 +243,7 @@ const updateCollection = asyncHandler(async (req, res) => {
       res.status(404).json({ message: "Collection not found" });
     }
   } catch (error) {
+    console.log("error", error);
     res.status(500).json({ message: error.message });
   }
 });

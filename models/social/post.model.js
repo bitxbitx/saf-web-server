@@ -89,11 +89,10 @@ const PostSchema = new mongoose.Schema(
   {
     name:{
       type: String,
-      required: true,
     },
     platform: {
       type: String,
-      enum: ["Facebook", "Shopee", "Instagram", "Lazada", "Twitter"],
+      enum: ["facebook", "shopee", "instagram", "lazada", "twitter", "ownApp"],
     },
     arrangement: {
       type: Number,
