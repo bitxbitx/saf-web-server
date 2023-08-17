@@ -218,22 +218,45 @@ const updateCollection = asyncHandler(async (req, res) => {
     if (collection) {
       collection.title = req.body.title || collection.title;
       collection.medias = req.body.medias || collection.medias;
-
-      console.log("req.body.posts", req.body.posts);
+      collection.captionedPosts = req.body.captionedPosts || collection.captionedPosts;
 
       // Check if there are new posts
       if (req.body.posts) {
-        // Check if there is _id field in the posts
+        // Separate new posts from existing posts
         const newPosts = req.body.posts.filter((post) => !post._id);
+        const existingPosts = req.body.posts.filter((post) => post._id);
 
-        console.log("newPosts", newPosts);
-
+        // Create new posts
         if (newPosts.length > 0) {
-          // Assuming you have a separate Post model defined (replace 'Post' with your actual model name)
           const createdPosts = await Post.create(newPosts);
-
-          // Add the IDs of the newly created posts to the collection's 'posts' field
           collection.posts.push(...createdPosts.map((post) => post._id));
+        }
+
+        // Update existing posts
+        if (existingPosts.length > 0) {
+          for (let post of existingPosts) {
+            await Post.findByIdAndUpdate(post._id, post, { new: true });
+          }
+        }
+      }
+
+      // Check if there are new captioned posts
+      if (req.body.captionedPosts) {
+        // Separate new captioned posts from existing captioned posts
+        const newCaptionedPosts = req.body.captionedPosts.filter((post) => !post._id);
+        const existingCaptionedPosts = req.body.captionedPosts.filter((post) => post._id);
+
+        // Create new captioned posts
+        if (newCaptionedPosts.length > 0) {
+          const createdCaptionedPosts = await Post.create(newCaptionedPosts);
+          collection.captionedPosts.push(...createdCaptionedPosts.map((post) => post._id));
+        }
+
+        // Update existing captioned posts
+        if (existingCaptionedPosts.length > 0) {
+          for (let post of existingCaptionedPosts) {
+            await Post.findByIdAndUpdate(post._id, post, { new: true });
+          }
         }
       }
 

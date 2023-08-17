@@ -89,11 +89,10 @@ const PostSchema = new mongoose.Schema(
   {
     name:{
       type: String,
-      required: true,
     },
     platform: {
       type: String,
-      enum: ["Facebook", "Shopee", "Instagram", "Lazada", "Twitter"],
+      enum: ["facebook", "shopee", "instagram", "ownApp", "lazada", "twitter"], 
     },
     arrangement: {
       type: Number,
@@ -108,7 +107,9 @@ const PostSchema = new mongoose.Schema(
     },
     caption: {
       type: String,
-      required: true,
+    },
+    season: {
+      type: String,
     },
     selectedMedias: [
       {
