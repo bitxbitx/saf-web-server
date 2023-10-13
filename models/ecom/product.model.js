@@ -61,6 +61,16 @@ const productSchema = mongoose.Schema(
             required: [true, 'Please add a name value'],
         },
         description: String,
+        category: String,
+        season: String,
+        festival: String,
+        articleNo: String,
+        color: String,
+        size: String,
+        stockCode: String,
+        price: Number,
+        promotionPrice: Number,
+        stockPlace: String,
         images: [{
             type: String,
         }],
@@ -69,15 +79,13 @@ const productSchema = mongoose.Schema(
             enum: ['active', 'inactive', 'closed'],
             default: 'active',
         },
-        category: {
-            type: String,
-        },
         platform: {
             type: String,
         },
         productLink:{
             type: String,
-        }
+        },        
+
     },
     {
         timestamps: true,
