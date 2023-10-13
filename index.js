@@ -102,6 +102,10 @@ app.use(
 app.use("/api/promo-codes", require("./routes/ecom/promoCode.routes"));
 app.use("/api/shop-location", require("./routes/ecom/shopLocation.routes"));
 app.use("/api/wishlist", require("./routes/ecom/wishlist.routes"));
+app.use(
+  "/api/product-collections",
+  require("./routes/ecom/productCollection.routes")
+);
 
 // Statistics Routes
 app.use("/api/statistics", require("./routes/statistics/statistics.routes"));
