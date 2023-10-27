@@ -9,6 +9,7 @@ const createProductTransaction = asyncHandler(async (req, res) => {
     const createdTransaction = await transaction.save();
     res.status(201).json(createdTransaction);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -74,7 +75,11 @@ const deleteProductTransaction = asyncHandler(async (req, res) => {
 const getTransactionsByProductId = asyncHandler(async (req, res) => {
   try {
     const transactions = await ProductTransaction.find({ product: req.params.id });
-    res.json(transactions);
+    if (transactions){
+      res.status(200).json(transactions);
+    } else {
+      res.status(404).json({ message: "Transactions not found" });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
