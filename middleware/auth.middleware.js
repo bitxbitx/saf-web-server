@@ -14,10 +14,13 @@ const protect = async (req, res, next) => {
     next();
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError) {
+      console.error(err);
       return res.status(401).json({ error: 'Not authorized, invalid token' });
     } else if (err instanceof jwt.TokenExpiredError) {
+      console.error(err);
       return res.status(403).json({ error: 'Not authorized, token expired' });
     } else {
+      console.error(err);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   }

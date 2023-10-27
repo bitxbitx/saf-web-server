@@ -18,8 +18,7 @@ const getProductTransactions = asyncHandler(async (req, res) => {
   try {
     const transactions = await ProductTransaction.find();
     res.json(transactions);
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 }

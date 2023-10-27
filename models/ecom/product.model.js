@@ -64,7 +64,7 @@ const productSchema = mongoose.Schema(
         category: String,
         season: String,
         festival: String,
-        articleNo: String,
+        articleNumber: String,
         color: String,
         size: String,
         stockCode: String,
@@ -79,13 +79,11 @@ const productSchema = mongoose.Schema(
             enum: ['active', 'inactive', 'closed'],
             default: 'active',
         },
-        platform: {
-            type: String,
-        },
-        productLink:{
-            type: String,
-        },        
-
+        stockMapping: [{
+            color: String,
+            size: String,
+            stock: Number,
+        }]
     },
     {
         timestamps: true,
@@ -94,11 +92,6 @@ const productSchema = mongoose.Schema(
     }
 );
 
-productSchema.virtual('articles', {
-    ref: 'Article',
-    localField: '_id',
-    foreignField: 'product',
-});
 
 // productSchema.virtual('completedOrders').get(function () {
 //     return this.articles.reduce((acc, article) => {
@@ -122,6 +115,38 @@ productSchema.virtual('articles', {
 //     return this.articles.reduce((acc, article) => {
 //         return acc + article.totalInventoryStock[0].totalInventoryStock;
 //     }, 0);
+// });
+
+// // Create a pre middleware that will run before 'save' and 'findOneAndUpdate' operations.
+// productSchema.pre(['save', 'findOneAndUpdate'], async function (next) {
+//     console.log('In pre-middleware, this:', this);
+//     if (this.isModified('color') || this.isModified('size')) {
+//         // Split the color and size strings into arrays
+//         const colors = this.color.split(',');
+//         const sizes = this.size.split(',');
+
+//         // Generate all combinations of color and size
+//         const combinations = [];
+//         for (const color of colors) {
+//             for (const size of sizes) {
+//                 combinations.push({ color, size, stock: 0 });
+//             }
+//         }
+
+//         // Add the combinations to stockMapping
+//         for (const combination of combinations) {
+//             const { color, size } = combination;
+
+//             // Check if the combination already exists in stockMapping
+//             const combinationExists = this.stockMapping.some(entry => entry.color === color && entry.size === size);
+
+//             if (!combinationExists) {
+//                 this.stockMapping.push(combination);
+//             }
+//         }
+//     }
+
+//     next();
 // });
 
 module.exports = mongoose.model('Product', productSchema);
