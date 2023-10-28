@@ -3,6 +3,8 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Order = require('../../models/ecom/order.model');
 const PromoCode = require('../../models/ecom/promoCode.model');
 const ProductVariant = require('../../models/ecom/productVariant.model');
+const Product = require('../../models/ecom/product.model');
+const ProductTransaction = require('../../models/ecom/productTransaction.model');
 /**
  * @swagger
  * tags:
@@ -192,6 +194,28 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
             }
           });
           product.save();
+        });
+
+        // Update Product Transaction
+        items.forEach(async item => {
+          const decoded = JSON.parse(item.product);
+          const product = await Product.findById(decoded._id).exec();
+          const productTransaction = new ProductTransaction({
+            product: decoded._id,
+            type: 'Sale',
+            stockCode: product.stockCode,
+            articleNumber: product.articleNumber,
+            color: decoded.color,
+            price: product.price,
+            opening: 0,
+            inStock: 0,
+            return: 0,
+            sizeStockMap: [{
+              size: decoded.size,
+              stock: item.quantity,
+            }],
+          });
+          await productTransaction.save();
         });
 
       } catch (error) {
