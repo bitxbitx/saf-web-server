@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../../models/ecom/product.model');
+const ProductTransaction = require('../../models/ecom/productTransaction.model');
 require('dotenv').config();
 
 const createProduct = asyncHandler(async (req, res) => {
@@ -42,6 +43,25 @@ const createProduct = asyncHandler(async (req, res) => {
 
     const product = new Product(req.body);
     await product.save();
+
+    // Create a ProductTransaction for the opening stock for each color ( sample data: 'S, M, L' )
+    const productTransactionsPromises = colors.forEach(async color => {
+      const productTransaction = new ProductTransaction({
+        product: product._id,
+        type: 'Opening',
+        stockCode: product.stockCode,
+        articleNumber: product.articleNumber,
+        color: color,
+        price: product.price,
+        opening: 0,
+        inStock: 0,
+        return: 0,
+        sizeStockMap: sizes.map(size => ({ size, stock: 0 })),
+      });
+      await productTransaction.save();
+    });
+
+    await Promise.all(productTransactionsPromises);
 
     res.status(201).json(product);
   } catch (error) {

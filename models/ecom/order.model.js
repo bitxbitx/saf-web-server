@@ -67,9 +67,9 @@ const orderSchema = Schema(
             required: true,
         },
         orderItems: [{
-            productVariant: {
+            product: {
                 type: Schema.Types.ObjectId,
-                ref: "ProductVariant",
+                ref: "Product",
                 required: true,
             },
             quantity: {
@@ -77,6 +77,14 @@ const orderSchema = Schema(
                 required: true,
             },
         }],
+        color: {
+            type: String,
+            required: true,
+        },
+        size: {
+            type: String,
+            required: true,
+        },
         totalPrice: {
             type: Number,
             required: true,

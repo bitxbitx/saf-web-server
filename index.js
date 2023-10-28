@@ -122,6 +122,11 @@ app.use("/api/uploads/collections", express.static("uploads/collections"));
 // Payment Routes
 app.use("/api/payment", require("./routes/payment/payment.routes.js"));
 
+// Welcome Route
+app.get("/", (req, res) => {
+  res.send("Welcome to the SAF API");
+});
+
 // Start the server
 const server = app.listen(port, async () => {
   logger.info(`App is running at http://localhost:${port}`);
