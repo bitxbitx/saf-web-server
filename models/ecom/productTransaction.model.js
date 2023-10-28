@@ -8,9 +8,14 @@ const productTransactionSchema = new mongoose.Schema(
             ref: 'Product',
             required: true,
         },
-        stockNumber: {
-            type: Number,
-            required: [true, 'Please add a stock number'],
+        type: {
+            type: String,
+            enum: ['Opening', 'In Stock', 'Return', 'Sale'],
+            required: [true, 'Please add a type'],
+        },
+        stockCode: {
+            type: String,
+            required: [true, 'Please add a stock code'],
         },
         articleNumber: {
             type: String,

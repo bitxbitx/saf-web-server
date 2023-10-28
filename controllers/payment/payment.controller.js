@@ -3,6 +3,8 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Order = require('../../models/ecom/order.model');
 const PromoCode = require('../../models/ecom/promoCode.model');
 const ProductVariant = require('../../models/ecom/productVariant.model');
+const Product = require('../../models/ecom/product.model');
+const ProductTransaction = require('../../models/ecom/productTransaction.model');
 /**
  * @swagger
  * tags:
@@ -46,9 +48,10 @@ const ProductVariant = require('../../models/ecom/productVariant.model');
 const calculateOrderAmount = (items, promoCode) => {
   total = 0;
   items.forEach(item => {
-    const decoded = JSON.parse(item.productVariant);
+    const decoded = JSON.parse(item.product);
     total += decoded.price * item.quantity;
   });
+  
   if (promoCode) {
     const decoded = JSON.parse(promoCode)
     if (decoded) {
@@ -165,11 +168,13 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
         // Extract Product variant from items
         const orderItems = [];
         items.forEach(item => {
-          const decoded = JSON.parse(item.productVariant);
+          const decoded = JSON.parse(item.product);
 
           orderItems.push({
-            "productVariant": decoded._id,
+            product: decoded._id,
             quantity: item.quantity,
+            color: decoded.color,
+            size: decoded.size,
           });
         });
         const order = new Order({
@@ -181,10 +186,37 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
 
         // Update Product Variant
         items.forEach(async item => {
-          const decoded = JSON.parse(item.productVariant);
-          const productVariant = await ProductVariant.findById(decoded._id).exec();
-          productVariant.stockOuttake -= item.quantity;
-          productVariant.save();
+          const decoded = JSON.parse(item.product);
+          const product = await Product.findById(decoded._id).exec();
+          product.stockMapping.forEach(async stock => {
+            if (stock.color === decoded.color && stock.size === decoded.size) {
+              stock.stock = stock.stock - item.quantity;
+            }
+          });
+          product.save();
+        });
+
+        // Update Product Transaction
+        items.forEach(async item => {
+          const decoded = JSON.parse(item.product);
+
+          const product = await Product.findById(decoded._id).exec();
+          const productTransaction = new ProductTransaction({
+            product: decoded._id,
+            type: 'Sale',
+            stockCode: product.stockCode,
+            articleNumber: product.articleNumber,
+            color: decoded.color,
+            price: product.price,
+            opening: 0,
+            inStock: 0,
+            return: 0,
+            sizeStockMap: [{
+              size: decoded.size,
+              stock: item.quantity,
+            }],
+          });
+          await productTransaction.save();
         });
 
       } catch (error) {

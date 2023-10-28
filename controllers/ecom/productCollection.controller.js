@@ -1,39 +1,45 @@
 const asyncHandler = require("express-async-handler");
 const ProductCollection = require("../../models/ecom/productCollection.model");
-const Product = require("../../models/ecom/product.model");
 
 const createProductCollection = asyncHandler(async (req, res) => {
   try {
-    // Handle file uploads
-    if (req.files) {
-      const files = req.files.map((file) => {
-        return file.path;
-      });
-      req.body.medias = files;
-    }
-
-    console.log("req.body", req.body);
-
+    console.log("Inside createProductCollection: ", req.body)
     const collection = new ProductCollection(req.body);
     const createdCollection = await collection.save();
     res.status(201).json(createdCollection);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+}
+);
 
 const getProductCollections = asyncHandler(async (req, res) => {
   try {
-    const collections = await ProductCollection.find();
+    const collections = await ProductCollection.find().populate({
+      path: "files", // Change this path to "productFile" to populate the productFile field of ProductCollection
+      populate: {
+        path: "products", // Populate the products array within the productFile
+        model: "Product" // Adjust the model to match your schema for the products
+      }
+    });
     res.json(collections);
-  } catch (error) {
+  }
+  catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
-});
+}
+);
 
 const getProductCollectionById = asyncHandler(async (req, res) => {
   try {
-    const collection = await ProductCollection.findById(req.params.id);
+    const collection = await ProductCollection.findById(req.params.id).populate({
+      path: "files", // Change this path to "productFile" to populate the productFile field of ProductCollection
+      populate: {
+        path: "products", // Populate the products array within the productFile
+        model: "Product" // Adjust the model to match your schema for the products
+      }
+    });
     if (collection) {
       res.json(collection);
     } else {
@@ -48,14 +54,6 @@ const updateProductCollection = asyncHandler(async (req, res) => {
   try {
     const collection = await ProductCollection.findById(req.params.id);
     if (collection) {
-      // Handle file uploads
-      if (req.files) {
-        const files = req.files.map((file) => {
-          return file.path;
-        });
-        req.body.medias = files;
-      }
-
       const updatedCollection = await ProductCollection.findByIdAndUpdate(
         req.params.id,
         req.body,
@@ -68,7 +66,8 @@ const updateProductCollection = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+}
+);
 
 const deleteProductCollection = asyncHandler(async (req, res) => {
   try {
@@ -82,13 +81,13 @@ const deleteProductCollection = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+}
+);
 
 module.exports = {
   createProductCollection,
   getProductCollections,
   getProductCollectionById,
   updateProductCollection,
-  deleteProductCollection,
+  deleteProductCollection
 };
-

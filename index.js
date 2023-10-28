@@ -106,6 +106,11 @@ app.use(
   "/api/product-collections",
   require("./routes/ecom/productCollection.routes")
 );
+app.use("/api/product-files", require("./routes/ecom/productFile.routes"));
+app.use(
+  "/api/product-transactions",
+  require("./routes/ecom/productTransaction.routes")
+);
 
 // Statistics Routes
 app.use("/api/statistics", require("./routes/statistics/statistics.routes"));
@@ -116,6 +121,11 @@ app.use("/api/uploads/collections", express.static("uploads/collections"));
 
 // Payment Routes
 app.use("/api/payment", require("./routes/payment/payment.routes.js"));
+
+// Welcome Route
+app.get("/", (req, res) => {
+  res.send("Welcome to the SAF API");
+});
 
 // Start the server
 const server = app.listen(port, async () => {

@@ -6,15 +6,15 @@ const ProductCollectionSchema = new Schema({
     type: String,
     required: true,
   },
-  products: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Product',
-    },
-  ],
   medias: [
     {
       type: String,
+    },
+  ],
+  files: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'ProductFile',
     },
   ],
 }, {
@@ -52,3 +52,4 @@ ProductCollectionSchema.virtual('video_count').get(function () {
 });
 
 module.exports = mongoose.model('ProductCollection', ProductCollectionSchema);
+
