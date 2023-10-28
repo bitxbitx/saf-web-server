@@ -199,6 +199,7 @@ const stripePayEndpointMethodId = asyncHandler(async (req, res) => {
         // Update Product Transaction
         items.forEach(async item => {
           const decoded = JSON.parse(item.product);
+
           const product = await Product.findById(decoded._id).exec();
           const productTransaction = new ProductTransaction({
             product: decoded._id,

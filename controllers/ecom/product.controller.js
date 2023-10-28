@@ -22,30 +22,30 @@ const createProduct = asyncHandler(async (req, res) => {
     // Generate all combinations of color and size
     const combinations = [];
     for (const color of colors) {
-        for (const size of sizes) {
-            combinations.push({ color, size, stock: 0 });
-        }
+      for (const size of sizes) {
+        combinations.push({ color, size, stock: 0 });
+      }
     }
 
     req.body.stockMapping = req.body.stockMapping || [];
 
     // Add the combinations to stockMapping
     for (const combination of combinations) {
-        const { color, size } = combination;
+      const { color, size } = combination;
 
-        // Check if the combination already exists in stockMapping
-        const combinationExists = req.body.stockMapping.some(entry => entry.color === color && entry.size === size);
+      // Check if the combination already exists in stockMapping
+      const combinationExists = req.body.stockMapping.some(entry => entry.color === color && entry.size === size);
 
-        if (!combinationExists) {
-          req.body.stockMapping.push(combination);
-        }
+      if (!combinationExists) {
+        req.body.stockMapping.push(combination);
+      }
     }
 
     const product = new Product(req.body);
     await product.save();
 
     // Create a ProductTransaction for the opening stock for each color ( sample data: 'S, M, L' )
-    const productTransactionsPromises = colors.forEach(async color => {
+    const productTransactionsPromises = colors.map(async color => {
       const productTransaction = new ProductTransaction({
         product: product._id,
         type: 'Opening',
@@ -59,12 +59,15 @@ const createProduct = asyncHandler(async (req, res) => {
         sizeStockMap: sizes.map(size => ({ size, stock: 0 })),
       });
       await productTransaction.save();
+      return productTransaction;
     });
 
     await Promise.all(productTransactionsPromises);
 
+
     res.status(201).json(product);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -114,23 +117,23 @@ const updateProduct = asyncHandler(async (req, res) => {
     // Generate all combinations of color and size
     const combinations = [];
     for (const color of colors) {
-        for (const size of sizes) {
-            combinations.push({ color, size, stock: 0 });
-        }
+      for (const size of sizes) {
+        combinations.push({ color, size, stock: 0 });
+      }
     }
 
     req.body.stockMapping = req.body.stockMapping || [];
 
     // Add the combinations to stockMapping
     for (const combination of combinations) {
-        const { color, size } = combination;
+      const { color, size } = combination;
 
-        // Check if the combination already exists in stockMapping
-        const combinationExists = req.body.stockMapping.some(entry => entry.color === color && entry.size === size);
+      // Check if the combination already exists in stockMapping
+      const combinationExists = req.body.stockMapping.some(entry => entry.color === color && entry.size === size);
 
-        if (!combinationExists) {
-          req.body.stockMapping.push(combination);
-        }
+      if (!combinationExists) {
+        req.body.stockMapping.push(combination);
+      }
     }
 
     const product = await Product.findOneAndUpdate(
