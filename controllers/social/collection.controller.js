@@ -212,59 +212,68 @@ const getCollectionById = asyncHandler(async (req, res) => {
  *                   type: string
  *                   description: Error message
  */
+// const updateCollection = asyncHandler(async (req, res) => {
+//   try {
+//     const collection = await Collection.findById(req.params.id);
+//     if (collection) {
+//       collection.title = req.body.title || collection.title;
+//       collection.medias = req.body.medias || collection.medias;
+//       collection.captionedPosts = req.body.captionedPosts || collection.captionedPosts;
+
+//       // Check if there are new posts
+//       if (req.body.posts) {
+//         // Separate new posts from existing posts
+//         const newPosts = req.body.posts.filter((post) => !post._id);
+//         const existingPosts = req.body.posts.filter((post) => post._id);
+
+//         // Create new posts
+//         if (newPosts.length > 0) {
+//           const createdPosts = await Post.create(newPosts);
+//           collection.posts.push(...createdPosts.map((post) => post._id));
+//         }
+
+//         // Update existing posts
+//         if (existingPosts.length > 0) {
+//           for (let post of existingPosts) {
+//             await Post.findByIdAndUpdate(post._id, post, { new: true });
+//           }
+//         }
+//       }
+
+//       // Check if there are new captioned posts
+//       if (req.body.captionedPosts) {
+//         // Separate new captioned posts from existing captioned posts
+//         const newCaptionedPosts = req.body.captionedPosts.filter((post) => !post._id);
+//         const existingCaptionedPosts = req.body.captionedPosts.filter((post) => post._id);
+
+//         // Create new captioned posts
+//         if (newCaptionedPosts.length > 0) {
+//           const createdCaptionedPosts = await Post.create(newCaptionedPosts);
+//           collection.captionedPosts.push(...createdCaptionedPosts.map((post) => post._id));
+//         }
+
+//         // Update existing captioned posts
+//         if (existingCaptionedPosts.length > 0) {
+//           for (let post of existingCaptionedPosts) {
+//             await Post.findByIdAndUpdate(post._id, post, { new: true });
+//           }
+//         }
+//       }
+
+//       const updatedCollection = await collection.save();
+//       res.json(updatedCollection);
+//     } else {
+//       res.status(404).json({ message: "Collection not found" });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
+
 const updateCollection = asyncHandler(async (req, res) => {
   try {
-    const collection = await Collection.findById(req.params.id);
-    if (collection) {
-      collection.title = req.body.title || collection.title;
-      collection.medias = req.body.medias || collection.medias;
-      collection.captionedPosts = req.body.captionedPosts || collection.captionedPosts;
-
-      // Check if there are new posts
-      if (req.body.posts) {
-        // Separate new posts from existing posts
-        const newPosts = req.body.posts.filter((post) => !post._id);
-        const existingPosts = req.body.posts.filter((post) => post._id);
-
-        // Create new posts
-        if (newPosts.length > 0) {
-          const createdPosts = await Post.create(newPosts);
-          collection.posts.push(...createdPosts.map((post) => post._id));
-        }
-
-        // Update existing posts
-        if (existingPosts.length > 0) {
-          for (let post of existingPosts) {
-            await Post.findByIdAndUpdate(post._id, post, { new: true });
-          }
-        }
-      }
-
-      // Check if there are new captioned posts
-      if (req.body.captionedPosts) {
-        // Separate new captioned posts from existing captioned posts
-        const newCaptionedPosts = req.body.captionedPosts.filter((post) => !post._id);
-        const existingCaptionedPosts = req.body.captionedPosts.filter((post) => post._id);
-
-        // Create new captioned posts
-        if (newCaptionedPosts.length > 0) {
-          const createdCaptionedPosts = await Post.create(newCaptionedPosts);
-          collection.captionedPosts.push(...createdCaptionedPosts.map((post) => post._id));
-        }
-
-        // Update existing captioned posts
-        if (existingCaptionedPosts.length > 0) {
-          for (let post of existingCaptionedPosts) {
-            await Post.findByIdAndUpdate(post._id, post, { new: true });
-          }
-        }
-      }
-
-      const updatedCollection = await collection.save();
-      res.json(updatedCollection);
-    } else {
-      res.status(404).json({ message: "Collection not found" });
-    }
+    const collection = await Collection.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
+    res.json(collection);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

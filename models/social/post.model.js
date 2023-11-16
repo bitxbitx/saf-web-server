@@ -87,12 +87,12 @@ const mongoose = require("mongoose");
  */
 const PostSchema = new mongoose.Schema(
   {
-    name:{
+    name: {
       type: String,
     },
     platform: {
       type: String,
-      enum: ["facebook", "shopee", "instagram", "ownApp", "lazada", "twitter"], 
+      enum: ["facebook", "shopee", "instagram", "ownApp", "lazada", "twitter"],
     },
     arrangement: {
       type: Number,
@@ -116,6 +116,12 @@ const PostSchema = new mongoose.Schema(
         type: String,
         required: false,
       },
+    ],
+    arrangements: [
+      [{
+        type: String,
+        required: false,
+      },]
     ],
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }

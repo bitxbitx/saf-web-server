@@ -91,7 +91,7 @@ const createPost = asyncHandler(async (req, res) => {
  */
 const getPost = asyncHandler(async (req, res) => {
     const post = await Post.findById(req.params.id).populate('comments');
-    res.json({ post });
+    res.json(post);
 });
 
 /**
@@ -126,8 +126,12 @@ const getPost = asyncHandler(async (req, res) => {
  *         description: Internal server error
  */
 const updatePost = asyncHandler(async (req, res) => {
-    const post = await Post.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
-    res.json({ post });
+    try {
+        const post = await Post.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
+        res.json(post);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 });
 
 /**
