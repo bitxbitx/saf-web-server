@@ -89,6 +89,18 @@ const CollectionSchema = new Schema(
         ref: "Post",
       },
     ],
+    files: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ImageFile",
+      },
+    ],
+    completedPosts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -129,10 +141,10 @@ CollectionSchema.pre(/^find/, function (next) {
     path: "posts",
     select: "-__v",
   })
-  .populate({
-    path: "captionedPosts",
-    select: "-__v",
-  });
+    .populate({
+      path: "captionedPosts",
+      select: "-__v",
+    });
   next();
 });
 
