@@ -87,7 +87,7 @@ const createCollection = asyncHandler(async (req, res) => {
 
 const getCollections = asyncHandler(async (req, res) => {
   try {
-    const collections = await Collection.find();
+    const collections = await Collection.find()
     res.json(collections);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -272,6 +272,7 @@ const getCollectionById = asyncHandler(async (req, res) => {
 
 const updateCollection = asyncHandler(async (req, res) => {
   try {
+    console.log("req.body.completedPosts", req.body.completedPosts);
     const collection = await Collection.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
     res.json(collection);
   } catch (error) {

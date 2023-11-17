@@ -112,8 +112,8 @@ const CollectionSchema = new Schema(
 CollectionSchema.virtual("photo_count").get(function () {
   // Loop through to check the extension of each media
   let count = 0;
-  for (let i = 0; i < this.medias.length; i++) {
-    const media = this.medias[i];
+  for (const element of this.medias) {
+    const media = element;
     const extension = media.split(".").pop();
     if (extension === "jpg" || extension === "png" || extension === "jpeg" || extension === "gif" || extension === "webp" || extension === "bmp") {
       count++;
@@ -125,8 +125,8 @@ CollectionSchema.virtual("photo_count").get(function () {
 CollectionSchema.virtual("video_count").get(function () {
   // Loop through to check the extension of each media
   let count = 0;
-  for (let i = 0; i < this.medias.length; i++) {
-    const media = this.medias[i];
+  for (const element of this.medias) {
+    const media = element;
     const extension = media.split(".").pop();
     if (extension === "mp4") {
       count++;
@@ -143,6 +143,13 @@ CollectionSchema.pre(/^find/, function (next) {
   })
     .populate({
       path: "captionedPosts",
+      select: "-__v",
+    }).populate({
+      path: "files",
+      select: "-__v",
+    })
+    .populate({
+      path: "completedPosts",
       select: "-__v",
     });
   next();

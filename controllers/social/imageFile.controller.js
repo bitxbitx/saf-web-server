@@ -1,10 +1,10 @@
 const asyncHandler = require('express-async-handler');
-const ImageFile = require('../../../models/social/imageFiles.model');
+const ImageFile = require('../../models/social/imageFile.model');
 
 const createImageFile = asyncHandler(async (req, res) => {
     try {
         console.log('Inside createImageFile: ', req.body);
-        const file = new ImageFile(req.body);
+        const file = new ImageFile(req.body.body);
         const createdFile = await file.save();
         res.status(201).json(createdFile);
     } catch (error) {
@@ -37,8 +37,9 @@ const getImageFileById = asyncHandler(async (req, res) => {
 const updateImageFile = asyncHandler(async (req, res) => {
     try {
         const file = await ImageFile.findById(req.params.id);
+        console.log('Inside updateImageFile: ', req.body.body, file)
         if (file) {
-            const updatedFile = await ImageFile.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            const updatedFile = await ImageFile.findByIdAndUpdate(req.params.id, req.body.body, { new: true });
             res.json(updatedFile);
         } else {
             res.status(404).json({ message: 'File not found' });

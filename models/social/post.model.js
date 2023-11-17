@@ -123,6 +123,9 @@ const PostSchema = new mongoose.Schema(
         required: false,
       },]
     ],
+    uniqueId: {
+      type: String,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

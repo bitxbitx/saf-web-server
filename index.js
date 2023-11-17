@@ -86,6 +86,7 @@ app.use("/api/likes", require("./routes/social/like.routes"));
 app.use("/api/comments", require("./routes/social/comment.routes"));
 app.use("/api/posts", require("./routes/social/post.routes"));
 app.use("/api/collections", require("./routes/social/collection.routes"));
+app.use("/api/image-files", require("./routes/social/imageFile.routes"));
 
 // E-commerce Routes
 app.use("/api/add-to-cart", require("./routes/ecom/addToCart.routes"));

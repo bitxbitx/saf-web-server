@@ -17,3 +17,5 @@ const ImageFileSchema = new Schema({
 });
 
 const ImageFile = mongoose.model("ImageFile", ImageFileSchema);
+
+module.exports = ImageFile;
